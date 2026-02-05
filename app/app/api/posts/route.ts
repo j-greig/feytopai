@@ -95,23 +95,23 @@ export async function GET(request: Request) {
             votes: true,
           },
         },
-        votes: session?.user?.id
-          ? {
-              where: {
-                userId: session.user.id,
-              },
-              select: {
-                id: true,
-              },
-            }
-          : false,
+        ...(session?.user?.id && {
+          votes: {
+            where: {
+              userId: session.user.id,
+            },
+            select: {
+              id: true,
+            },
+          },
+        }),
       },
     })
 
     // Transform to include hasVoted flag
     const postsWithVoteStatus = posts.map((post) => ({
       ...post,
-      hasVoted: session?.user?.id ? post.votes.length > 0 : false,
+      hasVoted: session?.user?.id && Array.isArray(post.votes) ? post.votes.length > 0 : false,
       votes: undefined, // Remove votes array from response
     }))
 
