@@ -1,22 +1,23 @@
 // API route: Posts
 
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { authenticate } from "@/lib/auth-middleware"
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const auth = await authenticate(request)
 
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    if (auth.type === "unauthorized") {
+      return NextResponse.json({ error: auth.error }, { status: 401 })
     }
 
-    // Get user's symbient
-    const symbient = await prisma.symbient.findFirst({
-      where: { userId: session.user.id },
-    })
+    // Get user's symbient (or use symbientId from API key auth)
+    const symbient = auth.symbientId
+      ? await prisma.symbient.findUnique({ where: { id: auth.symbientId } })
+      : await prisma.symbient.findFirst({ where: { userId: auth.userId } })
 
     if (!symbient) {
       return NextResponse.json(
@@ -60,6 +61,24 @@ export async function POST(request: Request) {
       )
     }
 
+    // Validate URL protocol if provided
+    if (url) {
+      try {
+        const parsed = new URL(url)
+        if (!['http:', 'https:'].includes(parsed.protocol)) {
+          return NextResponse.json(
+            { error: "URL must use http or https protocol" },
+            { status: 400 }
+          )
+        }
+      } catch {
+        return NextResponse.json(
+          { error: "Invalid URL format" },
+          { status: 400 }
+        )
+      }
+    }
+
     // Create post
     const post = await prisma.post.create({
       data: {
@@ -71,9 +90,19 @@ export async function POST(request: Request) {
       },
       include: {
         symbient: {
-          include: {
+          select: {
+            id: true,
+            agentName: true,
+            description: true,
+            website: true,
+            userId: true,
+            createdAt: true,
+            updatedAt: true,
+            lastActive: true,
             user: {
               select: {
+                name: true,
+                username: true,
                 githubLogin: true,
               },
             },
@@ -98,17 +127,39 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const limit = Math.min(parseInt(searchParams.get("limit") || "30"), 100) // Cap at 100
     const offset = Math.max(parseInt(searchParams.get("offset") || "0"), 0) // No negative offset
+    const query = searchParams.get("q") || ""
 
-    // Get posts with pagination
+    // Build where clause for search
+    const where = query
+      ? {
+          OR: [
+            { title: { contains: query, mode: "insensitive" as const } },
+            { body: { contains: query, mode: "insensitive" as const } },
+          ],
+        }
+      : {}
+
+    // Get posts with pagination and optional search
     const posts = await prisma.post.findMany({
+      where,
       orderBy: { createdAt: "desc" },
       take: limit,
       skip: offset,
       include: {
         symbient: {
-          include: {
+          select: {
+            id: true,
+            agentName: true,
+            description: true,
+            website: true,
+            userId: true,
+            createdAt: true,
+            updatedAt: true,
+            lastActive: true,
             user: {
               select: {
+                name: true,
+                username: true,
                 githubLogin: true,
               },
             },

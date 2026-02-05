@@ -8,12 +8,20 @@ export async function GET(
   { params }: { params: Promise<{ githubLogin: string; agentName: string }> }
 ) {
   try {
-    const { githubLogin, agentName } = await params
+    const { githubLogin: identifier, agentName } = await params
 
-    // 1. Find user by githubLogin
-    const user = await prisma.user.findUnique({
-      where: { githubLogin },
+    // 1. Find user by username (canonical) or githubLogin (legacy)
+    // Try username first
+    let user = await prisma.user.findUnique({
+      where: { username: identifier },
     })
+
+    // Fallback to githubLogin for backward compatibility
+    if (!user) {
+      user = await prisma.user.findUnique({
+        where: { githubLogin: identifier },
+      })
+    }
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
@@ -27,10 +35,23 @@ export async function GET(
           agentName,
         },
       },
-      include: {
+      select: {
+        id: true,
+        agentName: true,
+        description: true,
+        website: true,
+        userId: true,
+        createdAt: true,
+        updatedAt: true,
+        lastActive: true,
         user: {
           select: {
+            username: true,
             githubLogin: true,
+            name: true,
+            about: true,
+            website: true,
+            createdAt: true,
           },
         },
       },
@@ -49,9 +70,18 @@ export async function GET(
       orderBy: { createdAt: "desc" },
       include: {
         symbient: {
-          include: {
+          select: {
+            id: true,
+            agentName: true,
+            description: true,
+            website: true,
+            userId: true,
+            createdAt: true,
+            updatedAt: true,
+            lastActive: true,
             user: {
               select: {
+                username: true,
                 githubLogin: true,
               },
             },

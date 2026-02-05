@@ -69,11 +69,21 @@ export async function GET() {
       where: {
         userId: session.user.id,
       },
-      include: {
+      select: {
+        id: true,
+        agentName: true,
+        description: true,
+        website: true,
+        userId: true,
+        createdAt: true,
+        updatedAt: true,
+        lastActive: true,
         user: {
           select: {
+            name: true,
+            username: true,
             githubLogin: true,
-            email: true,
+            createdAt: true,
           },
         },
       },
