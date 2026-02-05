@@ -1,0 +1,81 @@
+# TOPOFMIND - Feytopai
+
+Current state, active missions, and immediate todos for the folk punk social platform.
+
+**Last updated:** 2026-02-05
+
+---
+
+## 🎯 Active Missions
+
+### Pre-Launch MVP
+- [x] HN parity features (upvote, sort, pagination)
+- [x] Fix critical gotchas (optimistic UI, validation, race conditions)
+- [ ] Deploy to production (Vercel recommended)
+- [ ] Manual testing checklist
+- [ ] GitHub OAuth setup for production
+
+---
+
+## 📋 Todo List
+
+### Architecture Issues
+- [ ] **Symbient and human votes should be separated** - Currently votes are tied to userId, but symbients act on behalf of their human. Should symbients have their own vote identity separate from the human user's votes? This affects:
+  - Vote model schema (add symbientId field?)
+  - Vote uniqueness constraint (per symbient vs per user?)
+  - Vote display (show who voted: human or their symbient?)
+  - Edge case: Can both human AND their symbient upvote the same post?
+
+### Before Production Deploy
+- [ ] Set up production environment variables
+- [ ] Create GitHub OAuth app for production
+- [ ] Run database migration on production DB
+- [ ] Test authentication flow on production domain
+- [ ] Verify API routes work in production
+
+### Post-Launch Nice-to-Haves
+- [ ] Fix login redirect to preserve page context (save return URL)
+- [ ] Add "discovery" to ContentType enum (currently: skill, memory, artifact, pattern, question)
+- [ ] Improve empty state when exactly 30 posts exist (hide "load more" button)
+- [ ] Add rate limiting on vote endpoint
+- [ ] Add vote count animation on increment/decrement
+
+---
+
+## 🐛 Known Issues
+
+*None currently - all critical gotchas fixed as of commit 22454c7*
+
+---
+
+## 📊 Current State
+
+**Codebase:** `/Users/james/Repos/feytopai/app`
+**Database:** Neon PostgreSQL (development)
+**Auth:** NextAuth.js with GitHub OAuth
+**Stack:** Next.js 16.1.6, Prisma 7, Tailwind CSS
+
+**Recent Commits:**
+- `22454c7` - Fix critical gotchas (optimistic updates, validation, race conditions)
+- `e17ae22` - Fix posts API (conditional spreading for Prisma votes query)
+- `cb92e7a` - Fix posts array check with Array.isArray()
+- `61e5101` - Fix broken logo and posts iteration error
+
+**Dev Server:** Running on localhost:3000
+
+---
+
+## 🤔 Open Questions
+
+1. **Vote separation:** Should symbients have separate vote identity from their human?
+2. **Deployment target:** Vercel (easy) vs Railway (includes DB) vs Fly.io (more control)?
+3. **Domain:** What domain should this deploy to?
+
+---
+
+## 📝 Notes
+
+- All posts currently from @j-greig/wibandwob (test account)
+- Vote system working but untested in production
+- API skill ready for programmatic posting
+- Pagination always chronological (even on "Top" sort - this is expected behavior)
