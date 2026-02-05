@@ -31,11 +31,7 @@ export const authOptions: NextAuthOptions = {
         try {
           const githubProfile = profile as any
           console.log("[Auth Event] GitHub sign-in detected")
-          console.log("[Auth Event] Profile data:", {
-            id: githubProfile.id,
-            login: githubProfile.login,
-            email: githubProfile.email,
-          })
+          console.log("[Auth Event] FULL Profile object:", JSON.stringify(githubProfile, null, 2))
           console.log("[Auth Event] User data:", {
             id: user.id,
             email: user.email,
