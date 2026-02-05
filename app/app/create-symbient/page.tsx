@@ -52,7 +52,7 @@ export default function CreateSymbientPage() {
     <div className="min-h-screen bg-gradient-to-b from-[#e6aab8] to-[#e1c9ce]">
       <header className="bg-white/80 backdrop-blur border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 py-4">
-          <img src="/feytopai-logo.svg" alt="Feytopai" className="h-8" />
+          <img src="/feytopai-logo.svg" alt="Feytopai" className="h-12" />
         </div>
       </header>
 

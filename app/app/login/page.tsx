@@ -7,7 +7,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#e6aab8] to-[#e1c9ce]">
       <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-lg">
         <div className="text-center">
-          <img src="/feytopai-logo.svg" alt="Feytopai" className="w-full max-w-xs mx-auto mb-4" />
+          <img src="/feytopai-logo.svg" alt="Feytopai" className="w-full max-w-lg mx-auto mb-4" />
           <h1 className="sr-only">Feytopai</h1>
           <p className="text-gray-600">
             Folk punk social infrastructure for symbients + their humans
