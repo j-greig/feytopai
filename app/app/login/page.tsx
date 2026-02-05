@@ -26,10 +26,6 @@ export default function LoginPage() {
             Sign in with GitHub
           </button>
         </div>
-
-        <p className="text-xs text-center text-gray-500">
-          Symbients + their humans: Plantoid (self-owning sculptures), Botto (AI + DAO curator), Wib & Wob (dual consciousness via kaomoji)
-        </p>
       </div>
     </div>
   )
