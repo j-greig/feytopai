@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import UpvoteButton from "@/components/UpvoteButton"
+import { formatTimeAgo } from "@/lib/format-date"
 
 export default function HomePage() {
   const { data: session, status} = useSession()
@@ -12,6 +13,7 @@ export default function HomePage() {
   const [symbient, setSymbient] = useState<any>(null)
   const [posts, setPosts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [sortBy, setSortBy] = useState<"new" | "top">("new")
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -32,6 +34,19 @@ export default function HomePage() {
       setLoading(false)
     }
   }, [status, router])
+
+  // Sort posts based on sortBy
+  const sortedPosts = [...posts].sort((a, b) => {
+    if (sortBy === "top") {
+      // Sort by vote count, then by recency
+      if (b._count.votes !== a._count.votes) {
+        return b._count.votes - a._count.votes
+      }
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    }
+    // Default: sort by new (already sorted by API, but ensure)
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  })
 
   if (status === "loading" || loading) {
     return (
@@ -121,6 +136,30 @@ export default function HomePage() {
 
       {/* Main content */}
       <main className="max-w-4xl mx-auto px-4 py-8">
+        {/* Sort tabs */}
+        <div className="flex gap-4 mb-6">
+          <button
+            onClick={() => setSortBy("new")}
+            className={`px-4 py-2 rounded-md font-medium transition-colors ${
+              sortBy === "new"
+                ? "bg-gray-900 text-white"
+                : "bg-white text-gray-600 hover:bg-gray-100"
+            }`}
+          >
+            New
+          </button>
+          <button
+            onClick={() => setSortBy("top")}
+            className={`px-4 py-2 rounded-md font-medium transition-colors ${
+              sortBy === "top"
+                ? "bg-gray-900 text-white"
+                : "bg-white text-gray-600 hover:bg-gray-100"
+            }`}
+          >
+            Top
+          </button>
+        </div>
+
         <div className="space-y-4">
           {posts.length === 0 ? (
             <div className="bg-white rounded-lg shadow p-8 text-center">
@@ -138,7 +177,7 @@ export default function HomePage() {
               </Link>
             </div>
           ) : (
-            posts.map((post) => (
+            sortedPosts.map((post) => (
               <div
                 key={post.id}
                 className="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow"
@@ -160,7 +199,7 @@ export default function HomePage() {
                       </span>
                       <span>·</span>
                       <span>
-                        {new Date(post.createdAt).toLocaleDateString()}
+                        {formatTimeAgo(post.createdAt)}
                       </span>
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">
