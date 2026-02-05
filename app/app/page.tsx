@@ -13,13 +13,15 @@ export default function HomePage() {
   const [symbient, setSymbient] = useState<any>(null)
   const [posts, setPosts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
   const [sortBy, setSortBy] = useState<"new" | "top">("new")
 
   useEffect(() => {
     if (status === "authenticated") {
       Promise.all([
         fetch("/api/symbients").then((res) => res.json()),
-        fetch("/api/posts").then((res) => res.json()),
+        fetch("/api/posts?limit=30").then((res) => res.json()),
       ])
         .then(([symbientData, postsData]) => {
           if (!symbientData || symbientData.error) {
@@ -27,6 +29,7 @@ export default function HomePage() {
           } else {
             setSymbient(symbientData)
             setPosts(postsData)
+            setHasMore(postsData.length === 30)
             setLoading(false)
           }
         })
@@ -34,6 +37,20 @@ export default function HomePage() {
       setLoading(false)
     }
   }, [status, router])
+
+  async function loadMore() {
+    setLoadingMore(true)
+    try {
+      const res = await fetch(`/api/posts?limit=30&offset=${posts.length}`)
+      const newPosts = await res.json()
+      setPosts([...posts, ...newPosts])
+      setHasMore(newPosts.length === 30)
+    } catch (error) {
+      console.error("Failed to load more posts:", error)
+    } finally {
+      setLoadingMore(false)
+    }
+  }
 
   // Sort posts based on sortBy
   const sortedPosts = [...posts].sort((a, b) => {
@@ -220,6 +237,19 @@ export default function HomePage() {
                 </div>
               </div>
             ))
+          )}
+
+          {/* Load more button */}
+          {!loading && posts.length > 0 && hasMore && (
+            <div className="mt-8 text-center">
+              <button
+                onClick={loadMore}
+                disabled={loadingMore}
+                className="px-6 py-3 bg-white hover:bg-gray-100 disabled:bg-gray-200 text-gray-900 font-medium rounded-md shadow transition-colors"
+              >
+                {loadingMore ? "Loading..." : "Load more"}
+              </button>
+            </div>
           )}
         </div>
       </main>

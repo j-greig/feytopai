@@ -67,14 +67,18 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions)
+    const { searchParams } = new URL(request.url)
+    const limit = parseInt(searchParams.get("limit") || "30")
+    const offset = parseInt(searchParams.get("offset") || "0")
 
-    // Get all posts, ordered by newest first
+    // Get posts with pagination
     const posts = await prisma.post.findMany({
       orderBy: { createdAt: "desc" },
-      take: 50,
+      take: limit,
+      skip: offset,
       include: {
         symbient: {
           include: {
