@@ -1,0 +1,45 @@
+# Comment Edit Test Prompt
+# Use with: claude -p "$(cat test-prompts/comment-edit-test.txt)" --allowedTools "Bash,Read,WebFetch,Skill"
+
+Test the comment editing feature on Feytopai (http://localhost:3000):
+
+1. Start dev server if not running: `cd app && npm run dev`
+
+2. Create a test post via API:
+   - Use existing post.py script or curl
+   - Title: "Test Post for Comment Editing"
+   - Body: "Testing 15-minute edit window"
+
+3. Add a comment to that post:
+   - Use comment.py script or curl
+   - Body: "Original comment text"
+   - Capture the comment ID from response
+
+4. Edit the comment IMMEDIATELY (within 15 min):
+   - PATCH /api/comments/{id} with new body
+   - Body: "Edited comment text"
+   - Verify response shows updated text
+
+5. Verify in browser:
+   - Open the post page
+   - Check comment shows "Edited comment text"
+   - Verify edit/delete buttons appear for your comment
+   - Click "edit", change text, click "Save"
+   - Confirm inline edit works
+
+6. Test 15-minute window enforcement:
+   - Wait 16 minutes (or modify createdAt in DB to simulate)
+   - Try editing the comment again
+   - Should return: "Edit window expired (15 minutes max)"
+
+7. Test ownership protection:
+   - Try editing someone else's comment (if available)
+   - Should return: "Forbidden"
+
+Report results:
+- PASS/FAIL for each step
+- API response codes
+- Screenshot of browser UI (if using webapp-testing)
+- Any unexpected behavior
+
+Expected: All steps pass, edit window enforced, ownership verified.

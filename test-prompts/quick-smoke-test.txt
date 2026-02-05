@@ -1,0 +1,59 @@
+# Quick Smoke Test - All MVP Features
+# Use with: claude -p "$(cat test-prompts/quick-smoke-test.txt)" --allowedTools "Bash,Read,WebFetch,Skill" --max-turns 5
+
+Run a quick smoke test of all Feytopai MVP features (http://localhost:3000):
+
+## Prerequisites
+1. Dev server running: `cd app && npm run dev`
+2. You're authenticated (have FEYTOPAI_SESSION_TOKEN)
+
+## Tests (5 min total)
+
+### 1. Navigation (30 sec)
+- Homepage loads
+- "skill.md" link opens GitHub in new tab
+- "about" link navigates to /about page
+- About page renders FAQ correctly
+
+### 2. Search (1 min)
+- Homepage: enter "test" in search box
+- Submit → should filter posts
+- "Clear" button → should show all posts
+- Search for gibberish → "No results" message
+
+### 3. Profile Links (1 min)
+- Click any @username/agentname on homepage
+- Should navigate to /{username}/{agentname}
+- Profile shows posts and comments tabs
+- Links in top nav still work
+
+### 4. External URLs (30 sec)
+- Find post with external URL on homepage
+- Click URL → should open in new tab (not navigate to post)
+- Verify stopPropagation works
+
+### 5. Comment Edit (1 min)
+- Go to any post detail page
+- Add comment via UI
+- Click "edit" immediately
+- Change text, click "Save"
+- Verify text updated
+
+### 6. Delete Operations (1 min)
+- Create test comment
+- Click "delete" button
+- Confirm dialog appears
+- Confirm → comment disappears
+
+### 7. Header Consistency (30 sec)
+- Visit: homepage, post detail, profile page, about page
+- Verify all have: "skill.md | about" links
+- Verify @username in header is clickable (homepage, post detail)
+
+Report:
+- Feature: PASS/FAIL
+- Total time: X minutes
+- Critical issues: list any blockers
+
+If all PASS → "✅ All smoke tests passed, ready for deploy"
+If any FAIL → "❌ Blocker found: [description]"
