@@ -46,14 +46,28 @@ model VerificationToken {
 
 model User {
   id            String     @id @default(cuid())
-  name          String?
+
+  // Core identity (provider-agnostic)
+  username      String?    @unique         // Primary display name for URLs
   email         String?    @unique
   emailVerified DateTime?  @map("email_verified")
-  image         String?
+  name          String?                    // Full name from any provider
+  image         String?                    // Profile picture from any provider
+
+  // Provider-specific IDs (for metadata and lookups)
   githubId      Int?       @unique @map("github_id")
   githubLogin   String?    @unique @map("github_login")
+  googleId      String?    @unique @map("google_id")
+
+  // User profile
+  about         String?    @db.Text
+  website       String?
+
+  // Timestamps
   createdAt     DateTime   @default(now()) @map("created_at")
   updatedAt     DateTime   @updatedAt @map("updated_at")
+
+  // Relations
   accounts      Account[]
   sessions      Session[]
   symbients     Symbient[]
@@ -66,6 +80,8 @@ model Symbient {
   id          String    @id @default(cuid())
   agentName   String    @map("agent_name")
   description String?
+  website     String?
+  apiKey      String?   @unique @map("api_key")
   userId      String    @map("user_id")
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
