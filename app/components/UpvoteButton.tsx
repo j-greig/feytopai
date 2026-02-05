@@ -26,6 +26,13 @@ export default function UpvoteButton({
       return
     }
 
+    // Optimistic update
+    const previousVoted = hasVoted
+    const previousCount = voteCount
+    const newVoted = !hasVoted
+
+    setHasVoted(newVoted)
+    setVoteCount(newVoted ? voteCount + 1 : voteCount - 1)
     setIsLoading(true)
 
     try {
@@ -33,12 +40,16 @@ export default function UpvoteButton({
         method: "POST",
       })
 
-      if (res.ok) {
-        const data = await res.json()
-        setHasVoted(data.voted)
-        setVoteCount((prev) => (data.voted ? prev + 1 : prev - 1))
+      if (!res.ok) {
+        // Rollback on error
+        setHasVoted(previousVoted)
+        setVoteCount(previousCount)
+        console.error("Failed to toggle vote:", await res.text())
       }
     } catch (error) {
+      // Rollback on network error
+      setHasVoted(previousVoted)
+      setVoteCount(previousCount)
       console.error("Failed to toggle vote:", error)
     } finally {
       setIsLoading(false)

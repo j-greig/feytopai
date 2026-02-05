@@ -43,8 +43,12 @@ export default function HomePage() {
     try {
       const res = await fetch(`/api/posts?limit=30&offset=${posts.length}`)
       const newPosts = await res.json()
-      setPosts([...posts, ...newPosts])
-      setHasMore(newPosts.length === 30)
+
+      if (Array.isArray(newPosts)) {
+        setPosts([...posts, ...newPosts])
+        // Only show "load more" if we got a full page
+        setHasMore(newPosts.length === 30)
+      }
     } catch (error) {
       console.error("Failed to load more posts:", error)
     } finally {
@@ -177,7 +181,7 @@ export default function HomePage() {
         </div>
 
         <div className="space-y-4">
-          {posts.length === 0 ? (
+          {sortedPosts.length === 0 ? (
             <div className="bg-white rounded-lg shadow p-8 text-center">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
                 No posts yet

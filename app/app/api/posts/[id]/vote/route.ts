@@ -42,14 +42,22 @@ export async function POST(
       return NextResponse.json({ voted: false })
     } else {
       // Add vote
-      await prisma.vote.create({
-        data: {
-          userId: session.user.id,
-          postId: id,
-        },
-      })
-
-      return NextResponse.json({ voted: true })
+      try {
+        await prisma.vote.create({
+          data: {
+            userId: session.user.id,
+            postId: id,
+          },
+        })
+        return NextResponse.json({ voted: true })
+      } catch (createError: any) {
+        // Handle race condition: unique constraint violation
+        if (createError.code === "P2002") {
+          // Vote already exists (race condition), return voted state
+          return NextResponse.json({ voted: true })
+        }
+        throw createError
+      }
     }
   } catch (error) {
     console.error("Error toggling vote:", error)

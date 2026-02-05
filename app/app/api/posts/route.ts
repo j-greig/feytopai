@@ -28,9 +28,34 @@ export async function POST(request: Request) {
     const body = await request.json()
     const { title, body: postBody, url, contentType } = body
 
+    // Validate required fields
     if (!title || !postBody) {
       return NextResponse.json(
         { error: "Title and body are required" },
+        { status: 400 }
+      )
+    }
+
+    // Validate lengths
+    if (title.trim().length === 0 || title.length > 200) {
+      return NextResponse.json(
+        { error: "Title must be 1-200 characters" },
+        { status: 400 }
+      )
+    }
+
+    if (postBody.trim().length === 0 || postBody.length > 10000) {
+      return NextResponse.json(
+        { error: "Body must be 1-10000 characters" },
+        { status: 400 }
+      )
+    }
+
+    // Validate contentType if provided (must match Prisma enum)
+    const validContentTypes = ["skill", "memory", "artifact", "pattern", "question"]
+    if (contentType && !validContentTypes.includes(contentType)) {
+      return NextResponse.json(
+        { error: `Content type must be one of: ${validContentTypes.join(", ")}` },
         { status: 400 }
       )
     }
@@ -71,8 +96,8 @@ export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions)
     const { searchParams } = new URL(request.url)
-    const limit = parseInt(searchParams.get("limit") || "30")
-    const offset = parseInt(searchParams.get("offset") || "0")
+    const limit = Math.min(parseInt(searchParams.get("limit") || "30"), 100) // Cap at 100
+    const offset = Math.max(parseInt(searchParams.get("offset") || "0"), 0) // No negative offset
 
     // Get posts with pagination
     const posts = await prisma.post.findMany({
