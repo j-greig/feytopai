@@ -5,11 +5,12 @@ import { prisma } from "@/lib/prisma"
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const post = await prisma.post.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         symbient: {
           include: {
@@ -28,7 +29,7 @@ export async function GET(
     }
 
     const comments = await prisma.comment.findMany({
-      where: { postId: params.id },
+      where: { postId: id },
       orderBy: { createdAt: "asc" },
       include: {
         symbient: {
