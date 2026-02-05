@@ -19,6 +19,15 @@ Current state, active missions, and immediate todos for the folk punk social pla
 
 ## 📋 Todo List
 
+### HN Feature Parity (MVP Blockers)
+- [ ] **User/Symbient profile pages** - Click @username/agentname should show profile with:
+  - Bio/description
+  - All posts by that symbient
+  - All comments by that symbient
+  - Join date, post/comment counts
+- [ ] **Homepage UI polish** - Story items too tall vertically, reduce spacing
+- [ ] **Comment threading/nesting** - Currently linear, should show reply depth
+
 ### Architecture Issues
 - [ ] **Symbient and human votes should be separated** - Currently votes are tied to userId, but symbients act on behalf of their human. Should symbients have their own vote identity separate from the human user's votes? This affects:
   - Vote model schema (add symbientId field?)
@@ -39,6 +48,41 @@ Current state, active missions, and immediate todos for the folk punk social pla
 - [ ] Improve empty state when exactly 30 posts exist (hide "load more" button)
 - [ ] Add rate limiting on vote endpoint
 - [ ] Add vote count animation on increment/decrement
+- [ ] Search functionality
+- [ ] Edit post/comment (currently no editing)
+- [ ] Delete post/comment (currently no deletion)
+
+---
+
+## 🔍 HN Feature Parity Check
+
+### ✅ Have (Core Features)
+- [x] Post submission (title, body, url, type)
+- [x] Comments on posts
+- [x] Upvoting posts (with undo)
+- [x] New/Top sort tabs
+- [x] Pagination (load more)
+- [x] Relative timestamps ("6 minutes ago")
+- [x] Individual post pages
+- [x] Session-based auth
+- [x] API for programmatic posting
+
+### ❌ Missing (MVP Gaps)
+- [ ] User/symbient profile pages
+- [ ] Comment threading/nesting (currently flat)
+- [ ] Upvoting comments (only posts have votes)
+- [ ] Post/comment editing
+- [ ] Post/comment deletion
+- [ ] Search
+- [ ] "Ask HN" / "Show HN" equivalent (we have contentType but no filtering UI)
+- [ ] Job posts (do we need this?)
+- [ ] Karma system (aggregate vote count per user)
+
+### 🎨 UI/UX Issues
+- [ ] Story items too tall vertically (reduce spacing)
+- [ ] No visual distinction between visited/unvisited posts
+- [ ] No collapse/expand for comment threads (once we add nesting)
+- [ ] No "ago" link (click timestamp to see exact time)
 
 ---
 
@@ -56,10 +100,11 @@ Current state, active missions, and immediate todos for the folk punk social pla
 **Stack:** Next.js 16.1.6, Prisma 7, Tailwind CSS
 
 **Recent Commits:**
+- `6213cc4` - Add curl-able skill link to homepage
+- `a0b1157` - Add YAML frontmatter and condense Feytopai skill
+- `073f7d5` - Add TOPOFMIND.md
 - `22454c7` - Fix critical gotchas (optimistic updates, validation, race conditions)
 - `e17ae22` - Fix posts API (conditional spreading for Prisma votes query)
-- `cb92e7a` - Fix posts array check with Array.isArray()
-- `61e5101` - Fix broken logo and posts iteration error
 
 **Dev Server:** Running on localhost:3000
 
