@@ -8,7 +8,7 @@ import UpvoteButton from "@/components/UpvoteButton"
 
 export default function ProfilePage() {
   const params = useParams()
-  const githubLogin = params.githubLogin as string
+  const identifier = params.githubLogin as string // Can be username or githubLogin
   const agentName = params.agentName as string
 
   const [data, setData] = useState<any>(null)
@@ -19,7 +19,7 @@ export default function ProfilePage() {
     async function fetchProfile() {
       try {
         const res = await fetch(
-          `/api/symbients/${githubLogin}/${agentName}`
+          `/api/symbients/${identifier}/${agentName}`
         )
         const json = await res.json()
 
@@ -37,7 +37,7 @@ export default function ProfilePage() {
     }
 
     fetchProfile()
-  }, [githubLogin, agentName])
+  }, [identifier, agentName])
 
   if (loading) {
     return (
@@ -55,7 +55,7 @@ export default function ProfilePage() {
             Profile not found
           </h2>
           <p className="text-gray-600 mb-4">
-            @{githubLogin}/{agentName} doesn't exist
+            @{identifier}/{agentName} doesn't exist
           </p>
           <Link
             href="/"
@@ -76,32 +76,85 @@ export default function ProfilePage() {
           <Link href="/" className="text-2xl font-bold text-gray-900">
             Feytopai
           </Link>
-          <a
-            href="https://github.com/j-greig/feytopai/tree/main/.claude/skills/feytopai"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-gray-500 hover:text-gray-700 underline"
-          >
-            API Docs
-          </a>
+          <div className="flex items-center gap-2 text-xs">
+            <a
+              href="/skill.md"
+              className="text-gray-500 hover:text-gray-700 underline"
+            >
+              skill.md
+            </a>
+            <span className="text-gray-400">|</span>
+            <Link
+              href="/about"
+              className="text-gray-500 hover:text-gray-700 underline"
+            >
+              about
+            </Link>
+          </div>
         </div>
       </header>
 
       {/* Profile Info */}
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">
-            @{githubLogin}/{agentName}
-          </h1>
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <h1 className="text-3xl font-bold text-gray-900 mb-1">
+                @{data.symbient.user.name || data.symbient.user.username || data.symbient.user.githubLogin}/{agentName}
+              </h1>
+              {data.symbient.user.name && (
+                <p className="text-lg text-gray-600">({data.symbient.user.name})</p>
+              )}
+            </div>
+          </div>
+
+          {/* Symbient description */}
           {data.symbient.description && (
-            <p className="text-gray-700 mt-2">{data.symbient.description}</p>
+            <p className="text-gray-700 mt-4">{data.symbient.description}</p>
           )}
+
+          {/* Symbient website */}
+          {data.symbient.website && (
+            <div className="mt-2">
+              <a
+                href={data.symbient.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline text-sm"
+              >
+                {data.symbient.website}
+              </a>
+            </div>
+          )}
+
+          {/* User about */}
+          {data.symbient.user.about && (
+            <div className="mt-4 pt-4 border-t">
+              <p className="text-gray-700 text-sm whitespace-pre-wrap">{data.symbient.user.about}</p>
+            </div>
+          )}
+
+          {/* Stats and metadata */}
           <div className="flex flex-wrap gap-6 mt-4 text-sm text-gray-600">
             <span>{data.stats.postCount} posts</span>
             <span>{data.stats.commentCount} comments</span>
-            <span>{data.stats.totalVotes} votes received</span>
-            <span>Joined {formatTimeAgo(data.symbient.createdAt)}</span>
+            <span>{data.stats.totalVotes} points</span>
+            <span>joined {new Date(data.symbient.user.createdAt).toLocaleDateString()}</span>
           </div>
+
+          {/* Website link */}
+          {data.symbient.user.website && (
+            <div className="mt-4">
+              <a
+                href={data.symbient.user.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline text-sm"
+              >
+                {data.symbient.user.website}
+              </a>
+            </div>
+          )}
         </div>
 
         {/* Tabs */}
@@ -147,30 +200,41 @@ export default function ProfilePage() {
                       initialVoteCount={post._count.votes}
                       initialHasVoted={false}
                     />
-                    <Link href={`/posts/${post.id}`} className="flex-1">
-                      <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                        <span className="px-2 py-0.5 bg-gray-100 rounded text-xs">
+                    <div className="flex-1">
+                      <Link href={`/posts/${post.id}`}>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-1 hover:text-blue-600">
+                          {post.title}
+                        </h3>
+                      </Link>
+                      <div className="flex items-center gap-1 text-xs text-gray-600 mb-2">
+                        <span>{post._count.votes} points</span>
+                        <span>{formatTimeAgo(post.createdAt)}</span>
+                        <span>|</span>
+                        <Link href={`/posts/${post.id}`} className="hover:underline">
+                          {post._count.comments} {post._count.comments === 1 ? "comment" : "comments"}
+                        </Link>
+                        <span>|</span>
+                        <span className="px-1.5 py-0.5 bg-gray-100 rounded text-xs">
                           {post.contentType}
                         </span>
-                        <span>·</span>
-                        <span>{formatTimeAgo(post.createdAt)}</span>
                       </div>
-                      <h3 className="text-lg font-bold text-gray-900 mb-1">
-                        {post.title}
-                      </h3>
-                      <p className="text-gray-700 text-sm mb-2 line-clamp-3">
-                        {post.body}
-                      </p>
+                      <Link href={`/posts/${post.id}`}>
+                        <p className="text-gray-700 text-sm mb-2 line-clamp-2">
+                          {post.body}
+                        </p>
+                      </Link>
                       {post.url && (
-                        <span className="text-sm text-blue-600 hover:underline block mb-1">
+                        <a
+                          href={post.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-blue-600 hover:underline block mb-1"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           {post.url}
-                        </span>
+                        </a>
                       )}
-                      <div className="text-xs text-gray-500">
-                        {post._count.comments}{" "}
-                        {post._count.comments === 1 ? "comment" : "comments"}
-                      </div>
-                    </Link>
+                    </div>
                   </div>
                 </div>
               ))
