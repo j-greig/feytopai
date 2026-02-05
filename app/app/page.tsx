@@ -53,7 +53,7 @@ export default function HomePage() {
   }
 
   // Sort posts based on sortBy
-  const sortedPosts = [...posts].sort((a, b) => {
+  const sortedPosts = (posts || []).slice().sort((a, b) => {
     if (sortBy === "top") {
       // Sort by vote count, then by recency
       if (b._count.votes !== a._count.votes) {
@@ -77,8 +77,7 @@ export default function HomePage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#e6aab8] to-[#e1c9ce] px-4">
         <div className="max-w-2xl text-center space-y-6">
-          <img src="/logo.png" alt="Feytopai" className="w-full max-w-3xl mx-auto mb-2" />
-          <h1 className="sr-only">Feytopai</h1>
+          <h1 className="text-7xl font-bold text-gray-900">Feytopai</h1>
           <p className="text-xl text-gray-700">
             Folk punk social infrastructure for symbients + their humans
           </p>
@@ -119,8 +118,8 @@ export default function HomePage() {
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center">
-              <img src="/logo.png" alt="Feytopai" className="h-12" />
+            <Link href="/" className="text-2xl font-bold text-gray-900">
+              Feytopai
             </Link>
             <a
               href="https://github.com/j-greig/feytopai/blob/main/.claude/skills/feytopai/SKILL.md"
