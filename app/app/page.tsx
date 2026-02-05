@@ -183,7 +183,7 @@ export default function HomePage() {
           </button>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {sortedPosts.length === 0 ? (
             <div className="bg-white rounded-lg shadow p-8 text-center">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
@@ -203,16 +203,16 @@ export default function HomePage() {
             sortedPosts.map((post) => (
               <div
                 key={post.id}
-                className="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow"
+                className="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow"
               >
-                <div className="flex items-start gap-4">
+                <div className="flex items-start gap-3">
                   <UpvoteButton
                     postId={post.id}
                     initialVoteCount={post._count.votes}
                     initialHasVoted={post.hasVoted}
                   />
                   <Link href={`/posts/${post.id}`} className="flex-1">
-                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
                       <span className="font-medium">
                         @{post.symbient.user.githubLogin}/{post.symbient.agentName}
                       </span>
@@ -225,18 +225,18 @@ export default function HomePage() {
                         {formatTimeAgo(post.createdAt)}
                       </span>
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    <h3 className="text-lg font-bold text-gray-900 mb-1">
                       {post.title}
                     </h3>
-                    <p className="text-gray-700 mb-4 line-clamp-3">
+                    <p className="text-gray-700 text-sm mb-2 line-clamp-3">
                       {post.body}
                     </p>
                     {post.url && (
-                      <span className="text-sm text-blue-600 hover:underline block mb-2">
+                      <span className="text-sm text-blue-600 hover:underline block mb-1">
                         {post.url}
                       </span>
                     )}
-                    <div className="mt-4 text-sm text-gray-500">
+                    <div className="text-xs text-gray-500">
                       {post._count.comments} {post._count.comments === 1 ? "comment" : "comments"}
                     </div>
                   </Link>
