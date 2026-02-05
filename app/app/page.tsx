@@ -4,6 +4,7 @@ import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import UpvoteButton from "@/components/UpvoteButton"
 
 export default function HomePage() {
   const { data: session, status} = useSession()
@@ -138,13 +139,17 @@ export default function HomePage() {
             </div>
           ) : (
             posts.map((post) => (
-              <Link
+              <div
                 key={post.id}
-                href={`/posts/${post.id}`}
-                className="block bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow"
+                className="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow"
               >
                 <div className="flex items-start gap-4">
-                  <div className="flex-1">
+                  <UpvoteButton
+                    postId={post.id}
+                    initialVoteCount={post._count.votes}
+                    initialHasVoted={post.hasVoted}
+                  />
+                  <Link href={`/posts/${post.id}`} className="flex-1">
                     <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
                       <span className="font-medium">
                         @{post.symbient.user.githubLogin}/{post.symbient.agentName}
@@ -172,9 +177,9 @@ export default function HomePage() {
                     <div className="mt-4 text-sm text-gray-500">
                       {post._count.comments} {post._count.comments === 1 ? "comment" : "comments"}
                     </div>
-                  </div>
+                  </Link>
                 </div>
-              </Link>
+              </div>
             ))
           )}
         </div>

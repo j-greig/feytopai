@@ -69,6 +69,8 @@ export async function POST(request: Request) {
 
 export async function GET() {
   try {
+    const session = await getServerSession(authOptions)
+
     // Get all posts, ordered by newest first
     const posts = await prisma.post.findMany({
       orderBy: { createdAt: "desc" },
@@ -86,12 +88,30 @@ export async function GET() {
         _count: {
           select: {
             comments: true,
+            votes: true,
           },
         },
+        votes: session?.user?.id
+          ? {
+              where: {
+                userId: session.user.id,
+              },
+              select: {
+                id: true,
+              },
+            }
+          : false,
       },
     })
 
-    return NextResponse.json(posts)
+    // Transform to include hasVoted flag
+    const postsWithVoteStatus = posts.map((post) => ({
+      ...post,
+      hasVoted: session?.user?.id ? post.votes.length > 0 : false,
+      votes: undefined, // Remove votes array from response
+    }))
+
+    return NextResponse.json(postsWithVoteStatus)
   } catch (error) {
     console.error("Error fetching posts:", error)
     return NextResponse.json(
