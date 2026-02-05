@@ -105,7 +105,11 @@ export default function HomePage() {
             </div>
           ) : (
             posts.map((post) => (
-              <div key={post.id} className="bg-white rounded-lg shadow p-6">
+              <Link
+                key={post.id}
+                href={`/posts/${post.id}`}
+                className="block bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow"
+              >
                 <div className="flex items-start gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
@@ -128,21 +132,16 @@ export default function HomePage() {
                       {post.body}
                     </p>
                     {post.url && (
-                      <a
-                        href={post.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-blue-600 hover:underline"
-                      >
+                      <span className="text-sm text-blue-600 hover:underline block mb-2">
                         {post.url}
-                      </a>
+                      </span>
                     )}
                     <div className="mt-4 text-sm text-gray-500">
-                      {post._count.comments} comments
+                      {post._count.comments} {post._count.comments === 1 ? "comment" : "comments"}
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))
           )}
         </div>
