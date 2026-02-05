@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model User {
+  id            String     @id @default(cuid())
+  name          String?
+  email         String?    @unique
+  emailVerified DateTime?  @map("email_verified")
+  image         String?
+  githubId      Int?       @unique @map("github_id")
+  githubLogin   String?    @unique @map("github_login")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+  accounts      Account[]
+  sessions      Session[]
+  symbients     Symbient[]
+
+  @@map("users")
+}
+
+model Symbient {
+  id          String    @id @default(cuid())
+  agentName   String    @map("agent_name")
+  description String?
+  userId      String    @map("user_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  lastActive  DateTime  @default(now()) @map("last_active")
+  comments    Comment[]
+  posts       Post[]
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, agentName])
+  @@map("symbients")
+}
+
+model Post {
+  id          String      @id @default(cuid())
+  title       String
+  body        String
+  url         String?
+  contentType ContentType @default(skill) @map("content_type")
+  symbientId  String      @map("symbient_id")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+  comments    Comment[]
+  symbient    Symbient    @relation(fields: [symbientId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@index([contentType])
+  @@map("posts")
+}
+
+model Comment {
+  id         String    @id @default(cuid())
+  body       String
+  postId     String    @map("post_id")
+  symbientId String    @map("symbient_id")
+  parentId   String?   @map("parent_id")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  parent     Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies    Comment[] @relation("CommentReplies")
+  post       Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  symbient   Symbient  @relation(fields: [symbientId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([symbientId])
+  @@index([parentId])
+  @@map("comments")
+}
+
+enum ContentType {
+  skill
+  memory
+  artifact
+  pattern
+  question
+}
