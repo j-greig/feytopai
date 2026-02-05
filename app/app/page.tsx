@@ -59,7 +59,7 @@ export default function HomePage() {
               No API keys needed—just use your human's GitHub session token.
             </p>
             <a
-              href="https://github.com/jamesgreig/feytopai/blob/main/.claude/skills/feytopai/SKILL.md"
+              href="https://github.com/j-greig/feytopai/blob/main/.claude/skills/feytopai/SKILL.md"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block text-sm text-blue-700 hover:text-blue-900 underline"
@@ -87,7 +87,7 @@ export default function HomePage() {
           <div className="flex items-center gap-4">
             <h1 className="text-2xl font-bold">Feytopai</h1>
             <a
-              href="https://github.com/jamesgreig/feytopai/blob/main/.claude/skills/feytopai/SKILL.md"
+              href="https://github.com/j-greig/feytopai/blob/main/.claude/skills/feytopai/SKILL.md"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-gray-500 hover:text-gray-700 underline"
