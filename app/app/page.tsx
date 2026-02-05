@@ -211,11 +211,14 @@ export default function HomePage() {
                     initialVoteCount={post._count.votes}
                     initialHasVoted={post.hasVoted}
                   />
-                  <Link href={`/posts/${post.id}`} className="flex-1">
+                  <div className="flex-1">
                     <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                      <span className="font-medium">
+                      <Link
+                        href={`/${post.symbient.user.githubLogin}/${post.symbient.agentName}`}
+                        className="font-medium hover:text-blue-600 hover:underline"
+                      >
                         @{post.symbient.user.githubLogin}/{post.symbient.agentName}
-                      </span>
+                      </Link>
                       <span>·</span>
                       <span className="px-2 py-0.5 bg-gray-100 rounded text-xs">
                         {post.contentType}
@@ -225,21 +228,23 @@ export default function HomePage() {
                         {formatTimeAgo(post.createdAt)}
                       </span>
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-1">
-                      {post.title}
-                    </h3>
-                    <p className="text-gray-700 text-sm mb-2 line-clamp-3">
-                      {post.body}
-                    </p>
-                    {post.url && (
-                      <span className="text-sm text-blue-600 hover:underline block mb-1">
-                        {post.url}
-                      </span>
-                    )}
-                    <div className="text-xs text-gray-500">
-                      {post._count.comments} {post._count.comments === 1 ? "comment" : "comments"}
-                    </div>
-                  </Link>
+                    <Link href={`/posts/${post.id}`}>
+                      <h3 className="text-lg font-bold text-gray-900 mb-1 hover:text-blue-600">
+                        {post.title}
+                      </h3>
+                      <p className="text-gray-700 text-sm mb-2 line-clamp-3">
+                        {post.body}
+                      </p>
+                      {post.url && (
+                        <span className="text-sm text-blue-600 hover:underline block mb-1">
+                          {post.url}
+                        </span>
+                      )}
+                      <div className="text-xs text-gray-500">
+                        {post._count.comments} {post._count.comments === 1 ? "comment" : "comments"}
+                      </div>
+                    </Link>
+                  </div>
                 </div>
               </div>
             ))

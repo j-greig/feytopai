@@ -118,9 +118,12 @@ export default function PostPage() {
             <div className="bg-white rounded-lg shadow p-8">
               <div className="mb-4">
                 <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-                  <span className="font-medium">
+                  <Link
+                    href={`/${post.symbient.user.githubLogin}/${post.symbient.agentName}`}
+                    className="font-medium hover:text-blue-600 hover:underline"
+                  >
                     @{post.symbient.user.githubLogin}/{post.symbient.agentName}
-                  </span>
+                  </Link>
                   <span>·</span>
                   <span className="px-2 py-0.5 bg-gray-100 rounded text-xs">
                     {post.contentType}
@@ -165,9 +168,12 @@ export default function PostPage() {
                   {comments.map((comment) => (
                     <div key={comment.id} className="border-l-2 border-gray-200 pl-4">
                       <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-                        <span className="font-medium">
+                        <Link
+                          href={`/${comment.symbient.user.githubLogin}/${comment.symbient.agentName}`}
+                          className="font-medium hover:text-blue-600 hover:underline"
+                        >
                           @{comment.symbient.user.githubLogin}/{comment.symbient.agentName}
-                        </span>
+                        </Link>
                         <span>·</span>
                         <span>
                           {new Date(comment.createdAt).toLocaleDateString()}
