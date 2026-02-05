@@ -6,26 +6,23 @@ Current state, active missions, and immediate todos for the folk punk social pla
 
 ---
 
-## Next Session: Auth Refactor (Email/Password)
+## Next Session: Magic Link Auth (Resend)
 
-Replace OAuth (GitHub/Google) with conventional email + password auth.
+Replace OAuth (GitHub/Google) with magic link auth via Resend + NextAuth EmailProvider.
 
-**Why:** Removes dependency on third-party OAuth provider configuration. No GitHub app setup, no Google console, no callback URLs per environment. Deploy anywhere with zero external config.
+**Why:** No passwords, no OAuth provider setup, no callback URLs. One email field, one button. Deploy anywhere with one env var (`RESEND_API_KEY`).
 
 **What's needed:**
-- Switch NextAuth session strategy from database to JWT (required for Credentials provider)
-- Add `passwordHash` field to User model (bcrypt already installed)
-- Build registration page (`/register`) with email + password
-- Update login page: email/password form replaces OAuth buttons
-- Password reset flow (needs email service: Resend, Sendgrid, or similar)
-- Migration: database is pre-launch, can clear if needed. No existing users to migrate.
+- Add Resend's Auth.js provider (official integration)
+- Switch NextAuth session strategy from database to JWT
+- Update login page: email input + "Send magic link" button
+- Remove GitHub/Google OAuth providers and env vars
+- Verify domain DNS for Resend (SPF/DKIM)
+- Pre-launch, no users to migrate
 
-**Gotchas to watch:**
-- NextAuth Credentials provider does NOT work with database sessions. Must use `session: { strategy: "jwt" }`. This changes how sessions are stored (client-side JWT instead of database Session table).
-- Password reset requires email sending infrastructure (not hard, but needs a service configured)
-- Could skip password reset for initial launch and add it after
+**Estimated effort:** ~1 hour for core implementation. DNS verification up to 24h.
 
-**Estimated effort:** Half a session for core login/register. Another half for password reset with email service.
+**Full plan:** `thinking/2026-02-05-magic-link-auth.md`
 
 ---
 
@@ -49,7 +46,7 @@ Replace OAuth (GitHub/Google) with conventional email + password auth.
 
 ## Before Production Deploy
 
-- [ ] **Auth refactor: email/password** (see above)
+- [ ] **Auth refactor: magic links via Resend** (see above)
 - [ ] Set up production environment variables
 - [ ] Run database migration on production DB
 - [ ] Test auth flow on production domain
@@ -61,7 +58,7 @@ Replace OAuth (GitHub/Google) with conventional email + password auth.
 
 ## Post-Launch Polish
 
-- [ ] Password reset flow (needs email service)
+- [ ] Email templates (custom magic link email styling)
 - [ ] Fix login redirect to preserve page context
 - [ ] Rate limiting on vote endpoint
 - [ ] Edit posts (currently only comments editable)
