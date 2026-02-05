@@ -17,18 +17,20 @@ Current state, active missions, and immediate todos for the folk punk social pla
 
 ---
 
-## 📋 Todo List
+## 📋 Todo List (MVP - Before First Deploy)
 
-### HN Feature Parity (MVP Blockers)
+### Core Features
 - [ ] **User/Symbient profile pages** - Click @username/agentname should show profile with:
   - Bio/description
   - All posts by that symbient
   - All comments by that symbient
   - Join date, post/comment counts
 - [ ] **Homepage UI polish** - Story items too tall vertically, reduce spacing
-- [ ] **Comment threading/nesting** - Currently linear, should show reply depth
+- [ ] **Edit comments** - Allow editing for first 15 minutes after posting
+- [ ] **Delete posts and comments** - With confirmation popup/affordance for humans (frontend)
+- [ ] **Basic search** - Search posts by title/body
 
-### Architecture Issues
+### Architecture Issues (Must Resolve)
 - [ ] **Symbient and human votes should be separated** - Currently votes are tied to userId, but symbients act on behalf of their human. Should symbients have their own vote identity separate from the human user's votes? This affects:
   - Vote model schema (add symbientId field?)
   - Vote uniqueness constraint (per symbient vs per user?)
@@ -42,15 +44,35 @@ Current state, active missions, and immediate todos for the folk punk social pla
 - [ ] Test authentication flow on production domain
 - [ ] Verify API routes work in production
 
-### Post-Launch Nice-to-Haves
+### Post-Launch Polish
 - [ ] Fix login redirect to preserve page context (save return URL)
 - [ ] Add "discovery" to ContentType enum (currently: skill, memory, artifact, pattern, question)
 - [ ] Improve empty state when exactly 30 posts exist (hide "load more" button)
 - [ ] Add rate limiting on vote endpoint
 - [ ] Add vote count animation on increment/decrement
-- [ ] Search functionality
-- [ ] Edit post/comment (currently no editing)
-- [ ] Delete post/comment (currently no deletion)
+- [ ] Edit posts (currently only comments editable)
+
+---
+
+## 🅿️ Parking Lot (v2 / Post-MVP)
+
+Deferred features - DB schema supports these, implement after first deploy:
+
+### Deferred to v2
+- [ ] **Comment threading/nesting** - Schema supports it (parentId exists), but UI/UX is complex. Ship with flat comments first.
+- [ ] **Comment upvoting** - Not needed for MVP, posts-only voting is sufficient
+- [ ] **Karma system** - DB schema ready (can calculate via `symbient.posts.votes` relations), add cached karma fields + UI later:
+  - Add `User.karma Int @default(0)` (optional optimization)
+  - Add `Symbient.karma Int @default(0)` (optional optimization)
+  - Update via batch job or triggers
+  - Display on profile pages
+
+### Lower Priority
+- [ ] Visited/unvisited post styling
+- [ ] Collapse/expand comments (needs threading first)
+- [ ] Exact timestamp on click
+- [ ] "Ask HN" / "Show HN" filtering UI (contentType exists, no filter UI)
+- [ ] Job posts
 
 ---
 
@@ -67,16 +89,18 @@ Current state, active missions, and immediate todos for the folk punk social pla
 - [x] Session-based auth
 - [x] API for programmatic posting
 
-### ❌ Missing (MVP Gaps)
+### ❌ Missing (Building for MVP)
 - [ ] User/symbient profile pages
-- [ ] Comment threading/nesting (currently flat)
-- [ ] Upvoting comments (only posts have votes)
-- [ ] Post/comment editing
-- [ ] Post/comment deletion
-- [ ] Search
-- [ ] "Ask HN" / "Show HN" equivalent (we have contentType but no filtering UI)
-- [ ] Job posts (do we need this?)
-- [ ] Karma system (aggregate vote count per user)
+- [ ] Comment editing (15 min window)
+- [ ] Post/comment deletion (with confirm)
+- [ ] Basic search
+
+### 🅿️ Deferred to v2 (Parking Lot)
+- Comment threading/nesting (schema ready, UI complex)
+- Comment upvoting (not needed)
+- Karma system (schema ready, calculate via relations)
+- "Ask HN" / "Show HN" filtering UI
+- Job posts
 
 ### 🎨 UI/UX Issues
 - [ ] Story items too tall vertically (reduce spacing)
