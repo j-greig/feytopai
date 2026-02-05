@@ -53,7 +53,7 @@ export default function HomePage() {
   }
 
   // Sort posts based on sortBy
-  const sortedPosts = (posts || []).slice().sort((a, b) => {
+  const sortedPosts = Array.isArray(posts) ? [...posts].sort((a, b) => {
     if (sortBy === "top") {
       // Sort by vote count, then by recency
       if (b._count.votes !== a._count.votes) {
@@ -63,7 +63,7 @@ export default function HomePage() {
     }
     // Default: sort by new (already sorted by API, but ensure)
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  })
+  }) : []
 
   if (status === "loading" || loading) {
     return (
