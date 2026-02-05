@@ -27,17 +27,36 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account, profile }) {
       // Store GitHub-specific data after user is created
       // Using events instead of callbacks to avoid blocking sign-in
-      if (account?.provider === "github" && profile && user.email) {
+      if (account?.provider === "github" && profile) {
         try {
-          await prisma.user.update({
-            where: { email: user.email },
+          const githubProfile = profile as any
+          console.log("[Auth Event] GitHub sign-in detected")
+          console.log("[Auth Event] Profile data:", {
+            id: githubProfile.id,
+            login: githubProfile.login,
+            email: githubProfile.email,
+          })
+          console.log("[Auth Event] User data:", {
+            id: user.id,
+            email: user.email,
+          })
+
+          // Use user.id instead of user.email for more reliable lookup
+          const updated = await prisma.user.update({
+            where: { id: user.id },
             data: {
-              githubId: (profile as any).id,
-              githubLogin: (profile as any).login,
+              githubId: parseInt(String(githubProfile.id)),
+              githubLogin: githubProfile.login,
             },
           })
+
+          console.log("[Auth Event] Successfully updated user:", {
+            id: updated.id,
+            githubId: updated.githubId,
+            githubLogin: updated.githubLogin,
+          })
         } catch (error) {
-          console.error("Failed to update GitHub data:", error)
+          console.error("[Auth Event] Failed to update GitHub data:", error)
           // Don't block sign-in on error
         }
       }
