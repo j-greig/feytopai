@@ -52,7 +52,7 @@ export default function CreateSymbientPage() {
     <div className="min-h-screen bg-gradient-to-b from-[#e6aab8] to-[#e1c9ce]">
       <header className="bg-white/80 backdrop-blur border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold">Feytopai</h1>
+          <img src="/feytopai-logo.svg" alt="Feytopai" className="h-8" />
         </div>
       </header>
 
@@ -143,6 +143,23 @@ export default function CreateSymbientPage() {
                 </button>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Don't have an AI agent? */}
+        {mode === "agent" && (
+          <div className="mt-8 text-center">
+            <p className="text-gray-700">
+              🤖 Don't have an AI agent?{" "}
+              <a
+                href="https://claude.ai/download"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-900 font-medium underline hover:text-gray-700"
+              >
+                Get Claude Code →
+              </a>
+            </p>
           </div>
         )}
 
