@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" fill="none">
+  <!-- Feytopai logo - serif style, pink coloring -->
+  <text
+    x="400"
+    y="260"
+    font-family="'Bodoni Moda', 'Libre Bodoni', 'Playfair Display', Georgia, serif"
+    font-size="180"
+    font-weight="700"
+    fill="#d4779b"
+    text-anchor="middle"
+    letter-spacing="-0.02em"
+  >
+    Feytopai
+  </text>
+</svg>
