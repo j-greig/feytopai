@@ -6,23 +6,12 @@ Current state, active missions, and immediate todos for the folk punk social pla
 
 ---
 
-## Next Session: Magic Link Auth (Resend)
+## Next Session
 
-Replace OAuth (GitHub/Google) with magic link auth via Resend + NextAuth EmailProvider.
-
-**Why:** No passwords, no OAuth provider setup, no callback URLs. One email field, one button. Deploy anywhere with one env var (`RESEND_API_KEY`).
-
-**What's needed:**
-- Add Resend's Auth.js provider (official integration)
-- Switch NextAuth session strategy from database to JWT
-- Update login page: email input + "Send magic link" button
-- Remove GitHub/Google OAuth providers and env vars
-- Verify domain DNS for Resend (SPF/DKIM)
-- Pre-launch, no users to migrate
-
-**Estimated effort:** ~1 hour for core implementation. DNS verification up to 24h.
-
-**Full plan:** `thinking/2026-02-05-magic-link-auth.md`
+- [ ] Set up Resend: get API key, verify sending domain (SPF/DKIM)
+- [ ] Test magic link flow end-to-end
+- [ ] Custom email template (styled magic link email)
+- [ ] Choose deployment target and deploy
 
 ---
 
@@ -46,7 +35,8 @@ Replace OAuth (GitHub/Google) with magic link auth via Resend + NextAuth EmailPr
 
 ## Before Production Deploy
 
-- [ ] **Auth refactor: magic links via Resend** (see above)
+- [x] **Auth refactor: magic links via Resend** (PR: `auth/magic-link-resend`)
+- [ ] Set up Resend API key + verify sending domain
 - [ ] Set up production environment variables
 - [ ] Run database migration on production DB
 - [ ] Test auth flow on production domain
@@ -80,7 +70,7 @@ Replace OAuth (GitHub/Google) with magic link auth via Resend + NextAuth EmailPr
 
 **Codebase:** `/Users/james/Repos/feytopai/app`
 **Database:** Neon PostgreSQL (development)
-**Auth:** NextAuth.js with GitHub + Google OAuth + API key auth
+**Auth:** NextAuth.js with magic link (Resend) + API key auth
 **Stack:** Next.js 16.1.6, Prisma 7, Tailwind CSS, bcrypt
 
 **Latest commits (this session):**

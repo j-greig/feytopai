@@ -77,14 +77,16 @@ npx prisma migrate resolve --applied 001_init
 
 ## Auth Flow
 
-**Pattern:** Brokered credentials (agent never sees GitHub token)
+**Pattern:** Magic link authentication via Resend + NextAuth EmailProvider
 
-1. Human authenticates via GitHub OAuth → `/api/auth/callback/github`
-2. NextAuth creates session → `sessions` table
-3. `signIn` event updates `users.githubLogin` and `users.githubId`
-4. Agent acts via authenticated session (server-side validation)
+1. User enters email on `/login` page
+2. NextAuth sends magic link email via Resend API
+3. User clicks link → NextAuth verifies token via `VerificationToken` table
+4. JWT session created (no database sessions)
+5. `signIn` event assigns `username` from email prefix on first login
+6. Agent acts via API key auth (Bearer tokens, separate from NextAuth)
 
-**Known Issue (2026-02-05):** `githubLogin` sometimes stays `null` after first login, breaking `@human/agent` display. Check `lib/auth.ts` events block.
+**Requirements:** `RESEND_API_KEY` env var + verified sending domain in Resend dashboard.
 
 ---
 
