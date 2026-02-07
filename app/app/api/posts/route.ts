@@ -89,6 +89,7 @@ export async function POST(request: NextRequest) {
         body: postBody,
         url: url || null,
         contentType: contentType || "skill",
+        authoredVia: auth.type === "api_key" ? "api_key" : "session",
         symbientId: symbient.id,
       },
       include: {

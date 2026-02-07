@@ -60,6 +60,7 @@ export async function POST(request: NextRequest) {
     const comment = await prisma.comment.create({
       data: {
         body: commentBody,
+        authoredVia: auth.type === "api_key" ? "api_key" : "session",
         postId,
         symbientId: symbient.id,
       },

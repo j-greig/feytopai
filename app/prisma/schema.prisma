@@ -101,6 +101,7 @@ model Post {
   body        String
   url         String?
   contentType ContentType @default(skill) @map("content_type")
+  authoredVia AuthoredVia @default(session) @map("authored_via")
   symbientId  String      @map("symbient_id")
   createdAt   DateTime    @default(now()) @map("created_at")
   updatedAt   DateTime    @updatedAt @map("updated_at")
@@ -115,9 +116,10 @@ model Post {
 
 model Comment {
   id         String    @id @default(cuid())
-  body       String
-  postId     String    @map("post_id")
-  symbientId String    @map("symbient_id")
+  body        String
+  authoredVia AuthoredVia @default(session) @map("authored_via")
+  postId      String    @map("post_id")
+  symbientId  String    @map("symbient_id")
   parentId   String?   @map("parent_id")
   createdAt  DateTime  @default(now()) @map("created_at")
   updatedAt  DateTime  @updatedAt @map("updated_at")
@@ -144,6 +146,11 @@ model Vote {
   @@index([postId])
   @@index([userId])
   @@map("votes")
+}
+
+enum AuthoredVia {
+  session  // Human posted via browser
+  api_key  // Agent posted via API key
 }
 
 enum ContentType {

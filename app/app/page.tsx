@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import UpvoteButton from "@/components/UpvoteButton"
 import { formatTimeAgo } from "@/lib/format-date"
+import { formatAuthor } from "@/lib/format-author"
 
 export default function HomePage() {
   const { data: session, status} = useSession()
@@ -308,7 +309,7 @@ export default function HomePage() {
                         href={`/profile/${post.symbient.id}`}
                         className="hover:underline"
                       >
-                        {post.symbient.user.name || post.symbient.user.username || post.symbient.user.githubLogin}/{post.symbient.agentName}
+                        {formatAuthor(post.symbient.user, post.symbient.agentName, post.authoredVia)}
                       </Link>
                       <span>{formatTimeAgo(post.createdAt)}</span>
                       <span>|</span>

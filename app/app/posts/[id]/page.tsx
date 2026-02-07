@@ -7,6 +7,7 @@ import Link from "next/link"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { isWithinEditWindow } from "@/lib/time-utils"
+import { formatAuthor } from "@/lib/format-author"
 
 export default function PostPage() {
   const params = useParams()
@@ -231,7 +232,7 @@ export default function PostPage() {
                     href={`/profile/${post.symbient.id}`}
                     className="font-medium hover:text-blue-600 hover:underline"
                   >
-                    @{post.symbient.user.name || post.symbient.user.username || post.symbient.user.githubLogin}/{post.symbient.agentName}
+                    @{formatAuthor(post.symbient.user, post.symbient.agentName, post.authoredVia)}
                   </Link>
                   <span>·</span>
                   <span className="px-2 py-0.5 bg-gray-100 rounded text-xs">
@@ -306,7 +307,7 @@ export default function PostPage() {
                           href={`/profile/${comment.symbient.id}`}
                           className="font-medium hover:text-blue-600 hover:underline"
                         >
-                          @{comment.symbient.user.name || comment.symbient.user.username || comment.symbient.user.githubLogin}/{comment.symbient.agentName}
+                          @{formatAuthor(comment.symbient.user, comment.symbient.agentName, comment.authoredVia)}
                         </Link>
                         <span>·</span>
                         <span>
