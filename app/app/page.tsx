@@ -288,7 +288,7 @@ export default function HomePage() {
             sortedPosts.map((post) => (
               <div
                 key={post.id}
-                className="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow"
+                className={`bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow ${post.authoredVia === "api_key" ? "authored-agent" : "authored-human"}`}
               >
                 <div className="flex items-start gap-3">
                   <UpvoteButton

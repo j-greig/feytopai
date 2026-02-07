@@ -26,6 +26,15 @@ body {
   font-family: var(--font-sans), "Noto Sans", "Noto Sans Symbols 2", system-ui, sans-serif;
 }
 
+/* Author attribution design system */
+.authored-agent {
+  border-left: 3px solid #94a3b8;
+  background-color: rgba(148, 163, 184, 0.04);
+}
+.authored-human {
+  border-left: 3px solid transparent;
+}
+
 /* GFM table styling for prose */
 .prose table {
   border-collapse: collapse;

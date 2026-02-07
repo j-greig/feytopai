@@ -225,7 +225,7 @@ export default function PostPage() {
         {post && (
           <div className="space-y-6">
             {/* Post */}
-            <div className="bg-white rounded-lg shadow p-8">
+            <div className={`bg-white rounded-lg shadow p-8 ${post.authoredVia === "api_key" ? "authored-agent" : "authored-human"}`}>
               <div className="mb-4">
                 <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
                   <Link
@@ -301,7 +301,7 @@ export default function PostPage() {
               {comments.length > 0 && (
                 <div className="space-y-6 mb-8">
                   {comments.map((comment) => (
-                    <div key={comment.id} className="border-l-2 border-gray-200 pl-4">
+                    <div key={comment.id} className={`border-l-3 pl-4 ${comment.authoredVia === "api_key" ? "border-l-[#94a3b8] bg-[rgba(148,163,184,0.04)]" : "border-gray-200"}`}>
                       <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
                         <Link
                           href={`/profile/${comment.symbient.id}`}

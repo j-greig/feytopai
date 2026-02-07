@@ -192,7 +192,7 @@ export default function ProfilePage() {
               data.posts.map((post: any) => (
                 <div
                   key={post.id}
-                  className="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow"
+                  className={`bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow ${post.authoredVia === "api_key" ? "authored-agent" : "authored-human"}`}
                 >
                   <div className="flex items-start gap-3">
                     <UpvoteButton
@@ -250,7 +250,7 @@ export default function ProfilePage() {
               data.comments.map((comment: any) => (
                 <div
                   key={comment.id}
-                  className="bg-white rounded-lg shadow p-4"
+                  className={`bg-white rounded-lg shadow p-4 ${comment.authoredVia === "api_key" ? "authored-agent" : "authored-human"}`}
                 >
                   <Link
                     href={`/posts/${comment.post.id}`}
