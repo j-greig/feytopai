@@ -1,46 +1,58 @@
 // NextAuth configuration
-// Multi-provider OAuth (GitHub + Google) + Prisma adapter for database sessions
+// Magic link auth via Resend EmailProvider + Prisma adapter for database sessions
 
 import { NextAuthOptions } from "next-auth"
-import GithubProvider from "next-auth/providers/github"
-import GoogleProvider from "next-auth/providers/google"
+import EmailProvider from "next-auth/providers/email"
 import { PrismaAdapter } from "@auth/prisma-adapter"
+import { Resend } from "resend"
 import { prisma } from "./prisma"
+
+// Lazy Resend client (avoids crash when AUTH_RESEND_KEY not set during build)
+let _resend: Resend | null = null
+function getResend(): Resend {
+  if (!_resend) {
+    if (!process.env.AUTH_RESEND_KEY) {
+      throw new Error("AUTH_RESEND_KEY environment variable is not set")
+    }
+    _resend = new Resend(process.env.AUTH_RESEND_KEY)
+  }
+  return _resend
+}
+
+// Minimal branded magic link email
+function magicLinkEmailHtml(url: string): string {
+  return `
+    <div style="max-width: 400px; margin: 0 auto; padding: 32px 24px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
+      <h1 style="font-size: 24px; font-weight: bold; color: #111; margin: 0 0 8px;">Feytopai</h1>
+      <p style="color: #666; font-size: 14px; margin: 0 0 24px;">Folk punk social infrastructure for symbients + their humans</p>
+      <a href="${url}"
+         style="display: inline-block; padding: 12px 32px; background: #eefe4a; color: #111; font-weight: 600; text-decoration: none; border-radius: 6px; font-size: 16px;">
+        Sign in to Feytopai
+      </a>
+      <p style="color: #999; font-size: 12px; margin: 24px 0 0;">
+        If you didn't request this, you can safely ignore this email.
+      </p>
+    </div>
+  `
+}
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any, // Type mismatch workaround
   providers: [
-    GithubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-      allowDangerousEmailAccountLinking: true, // Link accounts by verified email
-      profile(profile) {
-        return {
-          id: profile.id.toString(),
-          name: profile.name ?? profile.login,
-          email: profile.email,
-          image: profile.avatar_url,
-          login: profile.login, // Preserve GitHub username
-        }
-      },
-    }),
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      allowDangerousEmailAccountLinking: true, // Link accounts by verified email
-      profile(profile) {
-        // Derive username from email for Google users
-        const emailUsername = profile.email
-          .split("@")[0]
-          .replace(/[^a-z0-9-]/gi, "-")
-          .toLowerCase()
-
-        return {
-          id: profile.sub, // Google's user ID
-          name: profile.name,
-          email: profile.email,
-          image: profile.picture,
-          emailUsername, // Pass derived username
+    EmailProvider({
+      sendVerificationRequest: async ({ identifier: email, url }) => {
+        try {
+          await getResend().emails.send({
+            from:
+              process.env.RESEND_FROM_EMAIL ||
+              "Feytopai <feytopai@wibandwob.com>",
+            to: email,
+            subject: "Sign in to Feytopai",
+            html: magicLinkEmailHtml(url),
+          })
+        } catch (error) {
+          console.error("[Auth] Failed to send magic link email:", error)
+          throw new Error("Failed to send verification email")
         }
       },
     }),
@@ -70,82 +82,50 @@ export const authOptions: NextAuthOptions = {
     },
   },
   events: {
-    async signIn({ user, account, profile }) {
-      // Store provider-specific data and assign username after user is created
-      // Using events instead of callbacks to avoid blocking sign-in
-      if (account && profile) {
-        try {
-          console.log(`[Auth Event] ${account.provider} sign-in detected for user ${user.id}`)
+    async signIn({ user }) {
+      // Assign username from email if user doesn't have one yet
+      try {
+        const existingUser = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: { username: true },
+        })
 
-          // Check if user already has a username (account linking scenario)
-          const existingUser = await prisma.user.findUnique({
-            where: { id: user.id },
-            select: { username: true, githubId: true, googleId: true },
-          })
+        if (!existingUser?.username && user.email) {
+          // Derive username from email prefix
+          const baseUsername = user.email
+            .split("@")[0]
+            .replace(/[^a-z0-9-]/gi, "-")
+            .toLowerCase()
 
-          // Prepare update data
-          const updateData: any = {}
+          let finalUsername = baseUsername
+          let suffix = 2
 
-          // Set provider-specific IDs
-          if (account.provider === "github") {
-            const githubProfile = profile as any
-            updateData.githubId = parseInt(String(githubProfile.id))
-            updateData.githubLogin = githubProfile.login
-
-            // Assign username from GitHub if user doesn't have one
-            if (!existingUser?.username) {
-              updateData.username = githubProfile.login
-              console.log(`[Auth Event] Assigning username from GitHub: ${githubProfile.login}`)
-            }
-          } else if (account.provider === "google") {
-            const googleProfile = profile as any
-            updateData.googleId = googleProfile.sub
-
-            // Assign username from email if user doesn't have one
-            if (!existingUser?.username) {
-              // Derive from email and ensure uniqueness
-              const baseUsername = googleProfile.email
-                .split("@")[0]
-                .replace(/[^a-z0-9-]/gi, "-")
-                .toLowerCase()
-
-              let finalUsername = baseUsername
-              let suffix = 2
-
-              // Check for conflicts
-              while (true) {
-                const conflict = await prisma.user.findUnique({
-                  where: { username: finalUsername },
-                })
-                if (!conflict) break
-                finalUsername = `${baseUsername}-${suffix++}`
-              }
-
-              updateData.username = finalUsername
-              console.log(`[Auth Event] Assigning username from Google email: ${finalUsername}`)
-            }
+          // Check for conflicts
+          while (true) {
+            const conflict = await prisma.user.findUnique({
+              where: { username: finalUsername },
+            })
+            if (!conflict) break
+            finalUsername = `${baseUsername}-${suffix++}`
           }
 
-          // Update user with provider data and username
-          const updated = await prisma.user.update({
+          await prisma.user.update({
             where: { id: user.id },
-            data: updateData,
+            data: { username: finalUsername },
           })
 
-          console.log("[Auth Event] Successfully updated user:", {
-            id: updated.id,
-            username: updated.username,
-            githubId: updated.githubId,
-            googleId: updated.googleId,
-          })
-        } catch (error) {
-          console.error("[Auth Event] Failed to update user data:", error)
-          // Don't block sign-in on error
+          console.log(
+            `[Auth Event] Assigned username from email: ${finalUsername}`
+          )
         }
+      } catch (error) {
+        console.error("[Auth Event] Failed to assign username:", error)
+        // Don't block sign-in on error
       }
     },
   },
   pages: {
     signIn: "/login",
+    verifyRequest: "/login?verify=true",
   },
 }
