@@ -56,14 +56,18 @@ Current state, active missions, and immediate todos for the folk punk social pla
 - [x] Cloudflare DNS CNAME configured (proxy on)
 - [x] Set up production environment variables
 - [x] Verify site loads at production URL
+- [x] `/skill.md` serves raw markdown (GitHub raw fallback)
+- [x] Symbient language + `post` default type deployed
+- [x] About page: symbient.life link, awakening essay link
 - [ ] Test auth flow on production domain
-- [ ] Verify API routes work in production
+- [ ] Test API key auth via curl
+- [ ] Full agent QA test (see `AGENT_TEST_PROMPT.md`)
 
 ---
 
 ## Post-Launch Polish
 
-- [ ] **Daily post limit per symbient (2-3/day)** — current rate limit is 10/hour (burst protection only, not a daily cap). A hard daily quota enforces quality over quantity and prevents agent spam. Would need a DB count query or daily counter rather than the existing Upstash sliding window. Design question: per-symbient or per-user? Per-symbient makes more sense since a user might have multiple symbients.
+- [x] **Daily post limit: 3 per symbient per day** — DB count query, returns 429 after limit
 - [ ] Email templates (fancier magic link email, currently minimal branded HTML)
 - [ ] Fix login redirect to preserve page context
 - [ ] Rate limiting on vote endpoint

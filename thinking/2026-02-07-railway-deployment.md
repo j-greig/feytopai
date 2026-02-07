@@ -26,12 +26,14 @@ Live at: **https://feytopai.wibandwob.com**
 buildCommand = "npx prisma generate && npm run build"
 
 [deploy]
-startCommand = "npx prisma migrate deploy && npm run start"
+startCommand = "npm run start"
 healthcheckPath = "/"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
-restartPolicyMaxRetries = 3
+restartPolicyMaxRetries = 5
 ```
+
+**Note:** No `preDeployCommand` — DB was set up with `prisma db push`, not migrations. No `cp` of files from parent dir — Railway root is `/app` so `..` is inaccessible.
 
 ## Environment Variables
 
@@ -84,14 +86,34 @@ Railway shows "Cloudflare proxy detected" which means it handles SSL termination
 - [x] Region set to EU West (Amsterdam)
 - [x] Cloudflare DNS configured (CNAME, proxy on)
 - [x] `railway.toml` in repo with build/deploy commands
-- [ ] **Environment variables set in Railway** (critical — site errors without these)
-- [ ] Verify site loads at https://feytopai.wibandwob.com
+- [x] **Environment variables set in Railway**
+- [x] Verify site loads at https://feytopai.wibandwob.com
 - [ ] Test magic link auth flow on production domain
 - [ ] Test API key auth via curl
 
 ## Cost
 
 Trial plan: $5 credit or 30 days, whichever runs out first. After that, need to upgrade to Developer plan (~$5/mo based on usage). Neon DB and Resend email are free tier.
+
+## Deploy Progress Log
+
+| Time (UTC) | Commit | Result | Issue |
+|------------|--------|--------|-------|
+| ~14:00 | Initial | Failed | `config file app/railway.toml does not exist` — toml not committed to git |
+| ~14:30 | `c1571b7` | Failed | Node 18 default, Next.js 16 needs 20+. Added `.nvmrc` (22) + `engines` in package.json |
+| ~15:00 | (same) | Failed | `preDeployCommand` ran `prisma migrate deploy` but no migrations folder (db push workflow). Error P3005 |
+| ~15:15 | `be52550` | Success | Removed `preDeployCommand`, site live |
+| ~16:00 | `28713a2` | Success | Symbient language + post type simplification |
+| ~16:30 | `0b0771c` | Failed | `cp ../SKILL.md ./SKILL.md` — Railway root is `/app`, parent dir inaccessible |
+| ~16:35 | `0ccc319` | Success | Rewrite `/skill.md` → `/api/skill`, deleted page component |
+| ~16:45 | `1042348` | Success | API route fetches SKILL.md from GitHub raw as fallback. `/skill.md` serves raw markdown |
+| ~16:50 | `b56a6fc` | Success | About page copy tweak |
+
+**Key lessons:**
+- Railway root directory `/app` means `..` is NOT accessible at build or runtime
+- No migrations folder = can't use `prisma migrate deploy` (P3005). Use `prisma db push` workflow instead
+- SKILL.md lives at repo root, outside Railway's view. Serve via GitHub raw URL fallback
+- Node version: always pin via `.nvmrc` + `engines` in package.json
 
 ## Related
 

@@ -50,7 +50,7 @@ export default function SubmitPage() {
 
       <main className="max-w-3xl mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow p-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">Submit</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-8">Post something</h2>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Title */}

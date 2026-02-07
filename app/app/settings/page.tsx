@@ -175,7 +175,7 @@ export default function SettingsPage() {
               href="/submit"
               className="px-4 py-2 bg-[#eefe4a] hover:bg-[#eefe4a]/90 text-gray-900 font-medium rounded-md transition-colors text-sm"
             >
-              Submit
+              Post
             </Link>
             <Link
               href="/"
