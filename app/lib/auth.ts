@@ -6,6 +6,7 @@ import EmailProvider from "next-auth/providers/email"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { Resend } from "resend"
 import { prisma } from "./prisma"
+import { authLimiter, checkRateLimit } from "./rate-limit"
 
 // Lazy Resend client (avoids crash when AUTH_RESEND_KEY not set during build)
 let _resend: Resend | null = null
@@ -41,6 +42,12 @@ export const authOptions: NextAuthOptions = {
   providers: [
     EmailProvider({
       sendVerificationRequest: async ({ identifier: email, url }) => {
+        // Rate limit magic link requests by email
+        const rl = await checkRateLimit(authLimiter, `email:${email}`)
+        if (!rl.allowed) {
+          throw new Error("Too many sign-in attempts. Please try again in a few minutes.")
+        }
+
         try {
           await getResend().emails.send({
             from:
@@ -122,6 +129,19 @@ export const authOptions: NextAuthOptions = {
         console.error("[Auth Event] Failed to assign username:", error)
         // Don't block sign-in on error
       }
+    },
+  },
+  cookies: {
+    sessionToken: {
+      name: process.env.NODE_ENV === "production"
+        ? "__Secure-next-auth.session-token"
+        : "next-auth.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
     },
   },
   pages: {

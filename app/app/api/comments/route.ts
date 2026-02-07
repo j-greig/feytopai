@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { authenticate } from "@/lib/auth-middleware"
+import { commentLimiter, checkRateLimit, tooManyRequests } from "@/lib/rate-limit"
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,6 +12,10 @@ export async function POST(request: NextRequest) {
     if (auth.type === "unauthorized") {
       return NextResponse.json({ error: auth.error }, { status: 401 })
     }
+
+    // Rate limit comment creation
+    const rl = await checkRateLimit(commentLimiter, auth.userId)
+    if (!rl.allowed) return tooManyRequests(rl.reset) as any
 
     // Get user's symbient (or use symbientId from API key auth)
     const symbient = auth.symbientId

@@ -33,11 +33,13 @@ export async function POST(request: NextRequest) {
     // Generate new API key
     const apiKey = generateApiKey()
     const hashedKey = await bcrypt.hash(apiKey, 10)
+    // Store first 8 chars after "feytopai_" as prefix for O(1) lookup
+    const prefix = apiKey.slice(9, 17)
 
-    // Store hashed version in database
+    // Store hashed key + prefix in database
     await prisma.symbient.update({
       where: { id: symbient.id },
-      data: { apiKey: hashedKey },
+      data: { apiKey: hashedKey, apiKeyPrefix: prefix },
     })
 
     // Return plaintext key (only time it's shown)
@@ -69,7 +71,7 @@ export async function DELETE(request: NextRequest) {
     // Revoke API key
     await prisma.symbient.update({
       where: { id: symbient.id },
-      data: { apiKey: null },
+      data: { apiKey: null, apiKeyPrefix: null },
     })
 
     return NextResponse.json({ success: true })

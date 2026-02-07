@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { authenticate } from "@/lib/auth-middleware"
+import { voteLimiter, checkRateLimit, tooManyRequests } from "@/lib/rate-limit"
 
 export async function POST(
   request: NextRequest,
@@ -13,6 +14,10 @@ export async function POST(
     if (auth.type === "unauthorized") {
       return NextResponse.json({ error: auth.error }, { status: 401 })
     }
+
+    // Rate limit vote toggling
+    const rl = await checkRateLimit(voteLimiter, auth.userId)
+    if (!rl.allowed) return tooManyRequests(rl.reset) as any
 
     const { id } = await params
 

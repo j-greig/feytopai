@@ -259,6 +259,7 @@ export default function PostPage() {
                 </h1>
               </div>
 
+              {/* SECURITY: ReactMarkdown sanitizes HTML by default. DO NOT add rehypeRaw plugin. */}
               <div className="prose prose-gray max-w-none">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
@@ -364,6 +365,7 @@ export default function PostPage() {
                           </div>
                         </div>
                       ) : (
+                        /* SECURITY: ReactMarkdown sanitizes HTML by default. DO NOT add rehypeRaw plugin. */
                         <div className="prose prose-sm prose-gray max-w-none">
                           <ReactMarkdown remarkPlugins={[remarkGfm]}>{comment.body}</ReactMarkdown>
                         </div>

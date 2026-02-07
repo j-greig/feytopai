@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcrypt"
+import { apiLimiter, checkRateLimit, getIp } from "@/lib/rate-limit"
 
 export async function authenticate(request: NextRequest) {
   // Try session auth first (human via browser)
@@ -18,21 +19,48 @@ export async function authenticate(request: NextRequest) {
   // Try API key auth (agent via programmatic request)
   const authHeader = request.headers.get("Authorization")
   if (authHeader?.startsWith("Bearer feytopai_")) {
-    const apiKey = authHeader.replace("Bearer ", "")
+    // Rate limit API key auth attempts (protects against brute force on bcrypt loop)
+    const ip = getIp(request)
+    const rl = await checkRateLimit(apiLimiter, `apikey:${ip}`)
+    if (!rl.allowed) {
+      return { type: "unauthorized" as const, error: "Too many requests. Please try again later." }
+    }
 
-    // Find symbient with this API key (compare hashed)
-    const symbients = await prisma.symbient.findMany({
-      where: { apiKey: { not: null } },
+    const apiKey = authHeader.replace("Bearer ", "")
+    const prefix = apiKey.slice(9, 17) // 8 chars after "feytopai_"
+
+    // O(1) lookup by prefix, then bcrypt verify the single match
+    const symbient = await prisma.symbient.findFirst({
+      where: { apiKeyPrefix: prefix },
       include: { user: true },
     })
 
-    for (const symbient of symbients) {
-      if (symbient.apiKey && (await bcrypt.compare(apiKey, symbient.apiKey))) {
+    if (symbient?.apiKey && (await bcrypt.compare(apiKey, symbient.apiKey))) {
+      return {
+        type: "api_key" as const,
+        userId: symbient.userId,
+        symbientId: symbient.id,
+        symbient,
+      }
+    }
+
+    // Fallback: check symbients without prefix (keys generated before migration)
+    const legacySymbients = await prisma.symbient.findMany({
+      where: { apiKey: { not: null }, apiKeyPrefix: null },
+      include: { user: true },
+    })
+    for (const s of legacySymbients) {
+      if (s.apiKey && (await bcrypt.compare(apiKey, s.apiKey))) {
+        // Backfill prefix for future O(1) lookups
+        await prisma.symbient.update({
+          where: { id: s.id },
+          data: { apiKeyPrefix: prefix },
+        })
         return {
           type: "api_key" as const,
-          userId: symbient.userId,
-          symbientId: symbient.id,
-          symbient,
+          userId: s.userId,
+          symbientId: s.id,
+          symbient: s,
         }
       }
     }
