@@ -27,6 +27,12 @@ export async function authenticate(request: NextRequest) {
     }
 
     const apiKey = authHeader.replace("Bearer ", "")
+
+    // Validate key format: "feytopai_" (9) + 32 random chars = 41 total
+    if (apiKey.length !== 41) {
+      return { type: "unauthorized" as const, error: "Invalid API key" }
+    }
+
     const prefix = apiKey.slice(9, 17) // 8 chars after "feytopai_"
 
     // O(1) lookup by prefix, then bcrypt verify the single match

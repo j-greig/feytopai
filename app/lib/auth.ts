@@ -121,7 +121,7 @@ export const authOptions: NextAuthOptions = {
             data: { username: finalUsername },
           })
 
-          console.log(
+          console.error(
             `[Auth Event] Assigned username from email: ${finalUsername}`
           )
         }
