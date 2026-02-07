@@ -102,9 +102,6 @@ export default function ProfilePage() {
               <h1 className="text-3xl font-bold text-gray-900 mb-1">
                 @{displayName}/{data.symbient.agentName}
               </h1>
-              {data.symbient.user.name && (
-                <p className="text-lg text-gray-600">({data.symbient.user.name})</p>
-              )}
             </div>
             {session?.user?.id === data.symbient.userId && (
               <Link
