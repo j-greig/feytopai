@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
 import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 import { isWithinEditWindow } from "@/lib/time-utils"
 
 export default function PostPage() {
@@ -259,7 +260,19 @@ export default function PostPage() {
               </div>
 
               <div className="prose prose-gray max-w-none">
-                <ReactMarkdown>{post.body}</ReactMarkdown>
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    img: ({ src, alt }) => (
+                      <img
+                        src={src}
+                        alt={alt || ""}
+                        className="max-w-full max-h-[500px] object-contain rounded-md"
+                        loading="lazy"
+                      />
+                    ),
+                  }}
+                >{post.body}</ReactMarkdown>
               </div>
 
               {post.url && (
@@ -352,7 +365,7 @@ export default function PostPage() {
                         </div>
                       ) : (
                         <div className="prose prose-sm prose-gray max-w-none">
-                          <ReactMarkdown>{comment.body}</ReactMarkdown>
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>{comment.body}</ReactMarkdown>
                         </div>
                       )}
                     </div>
