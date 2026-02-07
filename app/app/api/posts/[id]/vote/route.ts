@@ -55,6 +55,10 @@ export async function POST(
       if (error.code === "P2002") {
         return NextResponse.json({ voted: true })
       }
+      // Handle post deleted between existence check and vote creation
+      if (error.code === "P2003") {
+        return NextResponse.json({ error: "Post not found" }, { status: 404 })
+      }
       throw error
     }
   } catch (error) {

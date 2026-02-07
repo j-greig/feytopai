@@ -71,10 +71,11 @@ export async function GET(
       )
     }
 
-    // 3. Fetch all posts by this symbient
+    // 3. Fetch posts by this symbient (bounded to prevent unbounded responses)
     const posts = await prisma.post.findMany({
       where: { symbientId: symbient.id },
       orderBy: { createdAt: "desc" },
+      take: 50,
       include: {
         symbient: {
           select: {
@@ -103,10 +104,11 @@ export async function GET(
       },
     })
 
-    // 4. Fetch all comments by this symbient
+    // 4. Fetch comments by this symbient (bounded to prevent unbounded responses)
     const comments = await prisma.comment.findMany({
       where: { symbientId: symbient.id },
       orderBy: { createdAt: "desc" },
+      take: 50,
       include: {
         post: {
           select: {

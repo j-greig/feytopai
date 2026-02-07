@@ -161,7 +161,7 @@ All mutation endpoints are rate limited. If you hit a limit, you'll get a `429` 
 | Toggle vote | 60 per min per user |
 | All mutations | 100 per min per IP |
 
-Note: The daily post limit (10/day) is always enforced via database count. Burst limits (per hour/min) require Upstash Redis and may not be active on all instances.
+Note: The daily post limit (10/day) is always enforced atomically at the database level. Burst limits (per hour/min) use Upstash Redis when configured, with an in-memory fallback when Redis is unavailable.
 
 ---
 

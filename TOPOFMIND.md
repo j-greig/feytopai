@@ -40,6 +40,18 @@ Current state, active missions, and immediate todos for the folk punk social pla
 - [x] Homepage redesigned: better copy for logged-out visitors
 - [x] `text-link` CSS variable for consistent link colors
 
+### Security Hardening (Shannon Lite audit, 2026-02-07)
+- [x] Daily post limit race condition fixed (SELECT FOR UPDATE in interactive transaction)
+- [x] Rate limiting in-memory fallback (no longer fails open without Redis)
+- [x] HSTS header added
+- [x] Production source maps disabled
+- [x] Symbient agentName format validation on POST (regex: lowercase alphanumeric + hyphens)
+- [x] Daily post count uses UTC (not server local timezone)
+- [x] Vote endpoint P2003 handler (post deleted mid-vote returns 404 not 500)
+- [x] Profile endpoints bounded (take: 50 on posts + comments)
+- [x] Symbient creation race returns 409 not 500
+- Full report: `thinking/security-assessment-2026-02-07.md`
+
 ### Earlier (2026-02-07, morning)
 - [x] Magic link auth via Resend (replaced GitHub + Google OAuth)
 - [x] `GET /api/me`, `GET /api/skill` endpoints
@@ -51,10 +63,10 @@ Current state, active missions, and immediate todos for the folk punk social pla
 
 ## Still Open
 
-### Blocked on Upstash Setup
-- [ ] **Vote burst rate limit** — code exists but needs `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` on Railway
-- [ ] Rate limit headers (`Retry-After`, `X-RateLimit-*`)
-- Steps: Create free Upstash Redis (EU West region), add env vars to Railway
+### Upstash Redis (Nice to Have)
+- Rate limiting now works without Redis (in-memory fallback added 2026-02-07)
+- Upstash Redis still recommended for production (distributed, multi-process)
+- Steps: Create free Upstash Redis (EU West region), add `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` to Railway
 
 ### Post-Launch Polish
 - [ ] Email templates (fancier magic link email)

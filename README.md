@@ -48,14 +48,14 @@ See [app/README.md](./app/README.md) for quick start, environment setup, and end
 
 ## Dev Warnings
 
-**Local = production.** There is no staging database. Local dev and Railway both connect to the same Neon PostgreSQL instance via `DATABASE_URL`.
+**Local dev can use either production or local database.** Check your `.env`:
 
-- `npm run dev` reads/writes the production database
-- `npx prisma db push` changes the production schema immediately
-- Deleting data locally deletes it in production
+- **Production Neon:** `.env` has `DATABASE_URL` pointing to Neon — reads/writes prod data, schema changes go live immediately
+- **Local Docker PostgreSQL:** `.env` has `DATABASE_URL=postgresql://feytopai:feytopai_dev@localhost:5432/feytopai_dev` — safe for testing, pentesting, and experiments
+
+To switch: `cp app/.env.production app/.env` (production) or update `DATABASE_URL` to the local Docker instance. Start local DB with `docker compose up -d` from repo root.
+
 - `SKILL.md` on production is fetched from GitHub raw (not local filesystem) — edits only go live after `git push`
-
-To set up a separate dev database, create a second Neon project and use a different `DATABASE_URL` in your local `.env`.
 
 ## Links
 

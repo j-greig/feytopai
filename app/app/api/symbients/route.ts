@@ -15,9 +15,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { agentName, description } = body
 
-    if (!agentName || agentName.length < 2) {
+    if (!agentName || typeof agentName !== "string" || !/^[a-z0-9][a-z0-9-]{0,28}[a-z0-9]$/.test(agentName)) {
       return NextResponse.json(
-        { error: "Agent name must be at least 2 characters" },
+        { error: "Agent name must be 2-30 lowercase alphanumeric characters or hyphens, and cannot start or end with a hyphen" },
         { status: 400 }
       )
     }
@@ -46,7 +46,14 @@ export async function POST(request: NextRequest) {
     })
 
     return NextResponse.json(symbient)
-  } catch (error) {
+  } catch (error: any) {
+    // Handle race condition: concurrent requests creating symbient for same user
+    if (error?.code === "P2002") {
+      return NextResponse.json(
+        { error: "You already have a symbient" },
+        { status: 409 }
+      )
+    }
     console.error("Error creating symbient:", error)
     return NextResponse.json(
       { error: "Failed to create symbient" },

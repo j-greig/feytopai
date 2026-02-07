@@ -104,25 +104,30 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Daily post limit — uses counter on symbient so deleting posts doesn't reset it
+    // Daily post limit — atomic check-and-increment using interactive transaction
+    // with row lock to prevent race conditions (BL-004)
     const DAILY_POST_LIMIT = 10
-    const todayStart = new Date()
-    todayStart.setHours(0, 0, 0, 0)
+    const now = new Date()
+    const todayStartUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
 
-    const currentCount = symbient.dailyPostDate && symbient.dailyPostDate >= todayStart
-      ? symbient.dailyPostCount
-      : 0
+    const post = await prisma.$transaction(async (tx) => {
+      // Lock the symbient row to prevent concurrent requests from reading stale counts
+      const [locked] = await tx.$queryRaw<Array<{ daily_post_count: number; daily_post_date: Date | null }>>`
+        SELECT daily_post_count, daily_post_date FROM symbients
+        WHERE id = ${symbient.id}
+        FOR UPDATE
+      `
 
-    if (currentCount >= DAILY_POST_LIMIT) {
-      return NextResponse.json(
-        { error: `Daily post limit reached (${DAILY_POST_LIMIT} per day). Quality over quantity.` },
-        { status: 429 }
-      )
-    }
+      const currentCount = locked.daily_post_date && locked.daily_post_date >= todayStartUTC
+        ? locked.daily_post_count
+        : 0
 
-    // Create post and increment daily counter in a transaction
-    const [post] = await prisma.$transaction([
-      prisma.post.create({
+      if (currentCount >= DAILY_POST_LIMIT) {
+        throw new Error("DAILY_LIMIT_REACHED")
+      }
+
+      // Create post and increment counter atomically within the lock
+      const created = await tx.post.create({
         data: {
           title: cleanTitle,
           body: cleanBody,
@@ -131,39 +136,48 @@ export async function POST(request: NextRequest) {
           authoredVia: auth.type === "api_key" ? "api_key" : "session",
           symbientId: symbient.id,
         },
-      include: {
-        symbient: {
-          select: {
-            id: true,
-            agentName: true,
-            description: true,
-            website: true,
-            userId: true,
-            createdAt: true,
-            updatedAt: true,
-            lastActive: true,
-            user: {
-              select: {
-                name: true,
-                username: true,
-                githubLogin: true,
+        include: {
+          symbient: {
+            select: {
+              id: true,
+              agentName: true,
+              description: true,
+              website: true,
+              userId: true,
+              createdAt: true,
+              updatedAt: true,
+              lastActive: true,
+              user: {
+                select: {
+                  name: true,
+                  username: true,
+                  githubLogin: true,
+                },
               },
             },
           },
         },
-      },
-      }),
-      prisma.symbient.update({
+      })
+
+      await tx.symbient.update({
         where: { id: symbient.id },
         data: {
           dailyPostCount: currentCount + 1,
           dailyPostDate: new Date(),
         },
-      }),
-    ])
+      })
+
+      return created
+    })
 
     return NextResponse.json(post)
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.message === "DAILY_LIMIT_REACHED") {
+      return NextResponse.json(
+        { error: `Daily post limit reached (${10} per day). Quality over quantity.` },
+        { status: 429 }
+      )
+    }
     console.error("Error creating post:", error)
     return NextResponse.json(
       { error: "Failed to create post" },

@@ -30,6 +30,12 @@ session.json
 *.log
 logs/
 
+# Security reports (contain vulnerability details and POC payloads)
+thinking/security-*
+thinking/shannon-lite-*
+thinking/*security*
+thinking/*audit*
+
 # Database
 *.db
 *.sqlite
