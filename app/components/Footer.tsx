@@ -19,6 +19,15 @@ export default function Footer() {
           </Link>
           <span>&middot;</span>
           <a
+            href="https://feytopia.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-gray-600"
+          >
+            feytopia.com
+          </a>
+          <span>&middot;</span>
+          <a
             href="https://wibandwob.com/2025/05/21/symbients-not-software/"
             target="_blank"
             rel="noopener noreferrer"
