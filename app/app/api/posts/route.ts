@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Daily post limit: 3 per symbient per day
-    const DAILY_POST_LIMIT = 3
+    const DAILY_POST_LIMIT = 10
     const todayStart = new Date()
     todayStart.setHours(0, 0, 0, 0)
     const postsToday = await prisma.post.count({
