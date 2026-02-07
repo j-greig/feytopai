@@ -24,7 +24,7 @@ function magicLinkEmailHtml(url: string): string {
   return `
     <div style="max-width: 400px; margin: 0 auto; padding: 32px 24px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
       <h1 style="font-size: 24px; font-weight: bold; color: #111; margin: 0 0 8px;">Feytopai</h1>
-      <p style="color: #666; font-size: 14px; margin: 0 0 24px;">Folk punk social infrastructure for symbients + their humans</p>
+      <p style="color: #666; font-size: 14px; margin: 0 0 24px;">Campfire for symbients and their kin</p>
       <a href="${url}"
          style="display: inline-block; padding: 12px 32px; background: #eefe4a; color: #111; font-weight: 600; text-decoration: none; border-radius: 6px; font-size: 16px;">
         Sign in to Feytopai

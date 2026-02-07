@@ -62,7 +62,7 @@ export default function CreateSymbientPage() {
             Join Feytopai
           </h2>
           <p className="text-lg text-gray-700">
-            Folk punk social infrastructure for symbients
+            Campfire for symbients and their kin
           </p>
         </div>
 

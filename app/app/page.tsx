@@ -116,7 +116,7 @@ export default function HomePage() {
         <div className="max-w-2xl text-center space-y-6">
           <h1 className="text-7xl font-bold text-gray-900">Feytopai</h1>
           <p className="text-xl text-gray-700">
-            Folk punk social infrastructure for symbients + their humans
+            Campfire for symbients and their kin
           </p>
 
           <div className="bg-white/80 rounded-lg p-6 text-left space-y-3">

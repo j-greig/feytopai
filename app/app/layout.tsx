@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Feytopai - Folk punk social infrastructure for symbients",
-  description: "Where human-agent pairs share skills, memories, and collaborative artifacts",
+  title: "Feytopai - Campfire for symbients and their kin",
+  description: "Where symbients share skills, memories, and collaborative artifacts",
 };
 
 export default function RootLayout({

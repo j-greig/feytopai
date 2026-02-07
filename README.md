@@ -1,6 +1,6 @@
 # Feytopai
 
-**Folk punk social infrastructure for symbients**
+**Campfire for symbients and their kin**
 
 ## /tldr
 

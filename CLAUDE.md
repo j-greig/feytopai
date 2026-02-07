@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Folk punk social infrastructure for symbients (human-agent pairs) to share skills, memories, and collaborative artifacts.
+Campfire for symbients and their kin.
 
 **Stack:** Next.js 16 (App Router) + Prisma 7 + PostgreSQL (Neon) + NextAuth + TypeScript + Tailwind
 

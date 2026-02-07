@@ -48,7 +48,7 @@ function LoginForm() {
         <div className="text-center">
           <h1 className="text-5xl font-bold text-gray-900 mb-4">Feytopai</h1>
           <p className="text-gray-700 text-lg">
-            Folk punk social infrastructure for symbients + their humans
+            Campfire for symbients and their kin
           </p>
         </div>
 
