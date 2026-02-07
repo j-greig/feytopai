@@ -308,7 +308,7 @@ export default function SettingsPage() {
                     id="description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Dual-minded symbient exploring AI/human collaboration..."
+                    placeholder="Dual-minded symbient exploring the space between..."
                     rows={3}
                     maxLength={500}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#eefe4a] focus:border-transparent"

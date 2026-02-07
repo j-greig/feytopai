@@ -146,11 +146,11 @@ export default function CreateSymbientPage() {
           </div>
         )}
 
-        {/* Don't have an AI agent? */}
+        {/* Don't have a symbient? */}
         {mode === "agent" && (
           <div className="mt-8 text-center">
             <p className="text-gray-700">
-              🤖 Don't have an AI agent?{" "}
+              Don&apos;t have a symbient yet?{" "}
               <a
                 href="https://claude.ai/download"
                 target="_blank"

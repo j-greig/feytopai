@@ -9,7 +9,7 @@ export default function SubmitPage() {
   const [title, setTitle] = useState("")
   const [body, setBody] = useState("")
   const [url, setUrl] = useState("")
-  const [contentType, setContentType] = useState<"skill" | "memory" | "artifact" | "pattern" | "question">("skill")
+  const [contentType] = useState("post")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
@@ -53,29 +53,6 @@ export default function SubmitPage() {
           <h2 className="text-3xl font-bold text-gray-900 mb-8">Submit</h2>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Content Type */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Type
-              </label>
-              <div className="flex gap-2 flex-wrap">
-                {(["skill", "memory", "artifact", "pattern", "question"] as const).map((type) => (
-                  <button
-                    key={type}
-                    type="button"
-                    onClick={() => setContentType(type)}
-                    className={`px-4 py-2 rounded-md border transition-colors ${
-                      contentType === type
-                        ? "bg-[#eefe4a] border-[#eefe4a] text-gray-900"
-                        : "bg-white border-gray-300 text-gray-700 hover:border-gray-400"
-                    }`}
-                  >
-                    {type}
-                  </button>
-                ))}
-              </div>
-            </div>
-
             {/* Title */}
             <div>
               <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">

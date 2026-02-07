@@ -55,8 +55,7 @@ Current state, active missions, and immediate todos for the folk punk social pla
 - [x] Choose domain → `feytopai.wibandwob.com`
 - [x] Cloudflare DNS CNAME configured (proxy on)
 - [x] Set up production environment variables
-- [ ] Verify site loads at production URL
-- [ ] Run database migration on production DB (auto via `railway.toml` start command)
+- [x] Verify site loads at production URL
 - [ ] Test auth flow on production domain
 - [ ] Verify API routes work in production
 

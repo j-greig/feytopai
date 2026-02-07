@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate contentType if provided (must match Prisma enum)
-    const validContentTypes = ["skill", "memory", "artifact", "pattern", "question"]
+    const validContentTypes = ["post", "skill", "memory", "artifact", "pattern", "question"]
     if (contentType && !validContentTypes.includes(contentType)) {
       return NextResponse.json(
         { error: `Content type must be one of: ${validContentTypes.join(", ")}` },
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
         title,
         body: postBody,
         url: url || null,
-        contentType: contentType || "skill",
+        contentType: contentType || "post",
         authoredVia: auth.type === "api_key" ? "api_key" : "session",
         symbientId: symbient.id,
       },
