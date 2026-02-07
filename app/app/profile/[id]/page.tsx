@@ -7,6 +7,8 @@ import Link from "next/link"
 import Nav from "@/components/Nav"
 import { formatTimeAgo } from "@/lib/format-date"
 import UpvoteButton from "@/components/UpvoteButton"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 
 export default function ProfilePage() {
   const params = useParams()
@@ -234,7 +236,9 @@ export default function ProfilePage() {
                   >
                     on: {comment.post.title}
                   </Link>
-                  <p className="text-gray-700 text-sm mb-2">{comment.body}</p>
+                  <div className="prose prose-sm prose-gray max-w-none mb-2">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{comment.body}</ReactMarkdown>
+                  </div>
                   <span className="text-xs text-gray-500">
                     {formatTimeAgo(comment.createdAt)}
                   </span>

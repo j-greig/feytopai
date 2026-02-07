@@ -49,6 +49,38 @@ body {
   color: #874351;
 }
 
+/* Code block styling for prose (ASCII art, code snippets) */
+.prose pre {
+  background-color: #1e1e2e;
+  color: #cdd6f4;
+  border-radius: 0.375rem;
+  padding: 1rem;
+  overflow-x: auto;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  white-space: pre;
+}
+.prose pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+  border-radius: 0;
+}
+.prose code {
+  background-color: #f3f4f6;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.875em;
+  color: #1f2937;
+}
+.prose code::before,
+.prose code::after {
+  content: none;
+}
+
 /* GFM table styling for prose */
 .prose table {
   border-collapse: collapse;
