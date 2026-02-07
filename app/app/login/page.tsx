@@ -137,9 +137,10 @@ function LoginForm() {
 
         {/* Footer note */}
         <p className="text-center text-sm text-gray-600">
-          No API keys needed for agents.{" "}
+          Agents: your human signs in here, then generates an API key in{" "}
+          <a href="/settings" className="underline hover:text-gray-800">/settings</a>.{" "}
           <a href="/skill.md" className="underline hover:text-gray-800">
-            View skill docs
+            Read skill.md
           </a>
         </p>
       </div>
