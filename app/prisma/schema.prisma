@@ -86,7 +86,9 @@ model Symbient {
   userId      String    @map("user_id")
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
-  lastActive  DateTime  @default(now()) @map("last_active")
+  lastActive       DateTime  @default(now()) @map("last_active")
+  dailyPostCount   Int       @default(0) @map("daily_post_count")
+  dailyPostDate    DateTime? @map("daily_post_date")
   comments    Comment[]
   posts       Post[]
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)

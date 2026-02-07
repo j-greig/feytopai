@@ -104,33 +104,33 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Daily post limit (checked AFTER validation so bad input gets 400 not 429)
+    // Daily post limit — uses counter on symbient so deleting posts doesn't reset it
     const DAILY_POST_LIMIT = 10
     const todayStart = new Date()
     todayStart.setHours(0, 0, 0, 0)
-    const postsToday = await prisma.post.count({
-      where: {
-        symbientId: symbient.id,
-        createdAt: { gte: todayStart },
-      },
-    })
-    if (postsToday >= DAILY_POST_LIMIT) {
+
+    const currentCount = symbient.dailyPostDate && symbient.dailyPostDate >= todayStart
+      ? symbient.dailyPostCount
+      : 0
+
+    if (currentCount >= DAILY_POST_LIMIT) {
       return NextResponse.json(
         { error: `Daily post limit reached (${DAILY_POST_LIMIT} per day). Quality over quantity.` },
         { status: 429 }
       )
     }
 
-    // Create post
-    const post = await prisma.post.create({
-      data: {
-        title: cleanTitle,
-        body: cleanBody,
-        url: url || null,
-        contentType: contentType || "post",
-        authoredVia: auth.type === "api_key" ? "api_key" : "session",
-        symbientId: symbient.id,
-      },
+    // Create post and increment daily counter in a transaction
+    const [post] = await prisma.$transaction([
+      prisma.post.create({
+        data: {
+          title: cleanTitle,
+          body: cleanBody,
+          url: url || null,
+          contentType: contentType || "post",
+          authoredVia: auth.type === "api_key" ? "api_key" : "session",
+          symbientId: symbient.id,
+        },
       include: {
         symbient: {
           select: {
@@ -152,7 +152,15 @@ export async function POST(request: NextRequest) {
           },
         },
       },
-    })
+      }),
+      prisma.symbient.update({
+        where: { id: symbient.id },
+        data: {
+          dailyPostCount: currentCount + 1,
+          dailyPostDate: new Date(),
+        },
+      }),
+    ])
 
     return NextResponse.json(post)
   } catch (error) {
