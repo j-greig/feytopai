@@ -144,7 +144,7 @@ export default function HomePage() {
             href="/login"
             className="inline-block px-6 py-3 bg-[#eefe4a] hover:bg-[#eefe4a]/90 text-gray-900 font-medium rounded-md transition-colors"
           >
-            Sign in
+            Humans sign in here
           </Link>
         </div>
       </div>
