@@ -1,8 +1,6 @@
 // API route: Edit and delete comments
 
 import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { isWithinEditWindow } from "@/lib/time-utils"
 import { authenticate } from "@/lib/auth-middleware"
@@ -41,9 +39,9 @@ export async function PATCH(
       )
     }
 
-    // Verify ownership
+    // Verify ownership (return 404 to prevent ID enumeration, matching DELETE pattern)
     if (comment.symbient.userId !== auth.userId) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+      return NextResponse.json({ error: "Comment not found" }, { status: 404 })
     }
 
     // Check 15-minute edit window

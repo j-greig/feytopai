@@ -35,9 +35,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (!postId || !commentBody) {
+    if (!postId || !commentBody || commentBody.trim().length === 0 || commentBody.length > 10000) {
       return NextResponse.json(
-        { error: "Post ID and comment body are required" },
+        { error: !postId ? "Post ID is required" : "Comment body must be 1-10000 characters" },
         { status: 400 }
       )
     }

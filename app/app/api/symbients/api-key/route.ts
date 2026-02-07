@@ -1,7 +1,6 @@
-import { NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { authenticate } from "@/lib/auth-middleware"
 import bcrypt from "bcrypt"
 import { randomBytes } from "crypto"
 
@@ -15,16 +14,16 @@ function generateApiKey(): string {
   return `feytopai_${key}`
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const auth = await authenticate(request)
+    if (auth.type === "unauthorized") {
+      return NextResponse.json({ error: auth.error }, { status: 401 })
     }
 
     // Get user's symbient
     const symbient = await prisma.symbient.findFirst({
-      where: { userId: session.user.id },
+      where: { userId: auth.userId },
     })
 
     if (!symbient) {
@@ -52,15 +51,15 @@ export async function POST(request: Request) {
   }
 }
 
-export async function DELETE(request: Request) {
+export async function DELETE(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const auth = await authenticate(request)
+    if (auth.type === "unauthorized") {
+      return NextResponse.json({ error: auth.error }, { status: 401 })
     }
 
     const symbient = await prisma.symbient.findFirst({
-      where: { userId: session.user.id },
+      where: { userId: auth.userId },
     })
 
     if (!symbient) {

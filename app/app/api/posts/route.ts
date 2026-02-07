@@ -129,6 +129,7 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(parseInt(searchParams.get("limit") || "30") || 30, 100) // Cap at 100, default 30 on NaN
     const offset = Math.max(parseInt(searchParams.get("offset") || "0") || 0, 0) // No negative offset, default 0 on NaN
     const query = searchParams.get("q") || ""
+    const sortBy = searchParams.get("sortBy") || "new"
 
     // Build where clause for search
     const where = query
@@ -144,7 +145,9 @@ export async function GET(request: NextRequest) {
     const [posts, total] = await Promise.all([
       prisma.post.findMany({
         where,
-        orderBy: { createdAt: "desc" },
+        orderBy: sortBy === "top"
+          ? [{ votes: { _count: "desc" as const } }, { createdAt: "desc" as const }]
+          : [{ createdAt: "desc" as const }],
         take: limit,
         skip: offset,
         include: {

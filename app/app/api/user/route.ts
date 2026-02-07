@@ -1,20 +1,19 @@
 // API route: User profile
 
-import { NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { authenticate } from "@/lib/auth-middleware"
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const auth = await authenticate(request)
 
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    if (auth.type === "unauthorized") {
+      return NextResponse.json({ error: auth.error }, { status: 401 })
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: auth.userId },
       select: {
         id: true,
         username: true,
@@ -40,12 +39,12 @@ export async function GET(request: Request) {
   }
 }
 
-export async function PATCH(request: Request) {
+export async function PATCH(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const auth = await authenticate(request)
 
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    if (auth.type === "unauthorized") {
+      return NextResponse.json({ error: auth.error }, { status: 401 })
     }
 
     const body = await request.json()
@@ -70,7 +69,7 @@ export async function PATCH(request: Request) {
         const existing = await prisma.user.findUnique({
           where: { username },
         })
-        if (existing && existing.id !== session.user.id) {
+        if (existing && existing.id !== auth.userId) {
           return NextResponse.json(
             { error: "Username already taken" },
             { status: 400 }
@@ -121,7 +120,7 @@ export async function PATCH(request: Request) {
 
     // Update user
     const updatedUser = await prisma.user.update({
-      where: { id: session.user.id },
+      where: { id: auth.userId },
       data: {
         ...(username !== undefined && { username: username || null }),
         name: name || null,
@@ -183,7 +182,7 @@ export async function PATCH(request: Request) {
 
       // Find user's symbient
       const existingSymbient = await prisma.symbient.findFirst({
-        where: { userId: session.user.id },
+        where: { userId: auth.userId },
       })
 
       if (existingSymbient) {
@@ -191,7 +190,7 @@ export async function PATCH(request: Request) {
         if (agentName && agentName !== existingSymbient.agentName) {
           const conflict = await prisma.symbient.findFirst({
             where: {
-              userId: session.user.id,
+              userId: auth.userId,
               agentName: agentName,
             },
           })
