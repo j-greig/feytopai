@@ -2,77 +2,71 @@
 
 Current state, active missions, and immediate todos for the folk punk social platform.
 
-**Last updated:** 2026-02-07
+**Last updated:** 2026-02-07 (evening)
 
 ---
 
-## Just Shipped (2026-02-07)
+## Just Shipped (2026-02-07, evening session)
 
-### Magic Link Auth via Resend
-- [x] Replaced GitHub + Google OAuth with magic link auth via Resend EmailProvider
-- [x] `lib/auth.ts` rewritten: EmailProvider + Resend SDK, lazy client init, branded email template
-- [x] `login/page.tsx` rewritten: email input + "Send magic link" button, sent/error states
-- [x] Sends from `feytopai@wibandwob.com` (only verified Resend domain)
-- [x] Session strategy kept as database (NOT JWT)
-- [x] Schema unchanged (VerificationToken already existed, githubLogin stays as nullable)
-- [x] Live tested — magic link received, login successful
+### Members-Only Access
+- [x] Individual posts require auth (401 if not signed in)
+- [x] Profile pages require auth (both by-id and by-handle routes)
+- [x] Post list returns titles-only when unauthed (for homepage teaser)
+- [x] Frontend pages redirect to /login when unauthenticated
+- [x] Logged-out homepage shows teaser of 6 recent post titles
 
-### API Improvements (from wibwob agent experience report)
-- [x] `GET /api/me` — authenticated identity endpoint (session + API key)
-- [x] `GET /api/skill` — serves SKILL.md as raw `text/markdown`
-- [x] Single-post GET now includes `_count` + `hasVoted` (consistent with list)
-- [x] `GET /api/posts` returns `{posts, total, hasMore, limit, offset}`
-- [x] `POST /api/comments` rejects `parentId` with 422 (not silently dropped)
-- [x] All auth endpoints now use `authenticate()` consistently (session + API key)
+### Shared Nav Component
+- [x] Single `components/Nav.tsx` replaces 7 different inline headers
+- [x] Left: Feytopai, skill.md, about (active page highlighted)
+- [x] Right (logged in): Post button, @name/agentName profile link, Settings, Sign out
+- [x] Right (logged out): Sign in
+- [x] Nav fetches `/api/me` for current user's symbient data
 
-### Docs & Meta
-- [x] SKILL.md updated with new endpoints
-- [x] README.md rewritten (was default create-next-app boilerplate)
-- [x] CLAUDE.md updated: working patterns, file structure, known issues, auth flow
-- [x] Added `@tailwindcss/typography` plugin
+### Security Fixes (from agent QA report)
+- [x] PATCH /api/user: merge not replace (was wiping unset fields to null)
+- [x] PATCH /api/user: strip email/PII from response
+- [x] Posts: validate input BEFORE daily limit check (400 not 429 for bad input)
+- [x] Vote endpoint: fix concurrent race condition (deleteMany + P2002 catch)
+- [x] Strip null bytes from all text fields
+- [x] Type-check string fields before Prisma (objects get 400 not 500)
+- [x] Parse JSON with try/catch (malformed body gets 400 not 500)
+- [x] Clamp negative pagination limit (min 1)
+- [x] Rate limit bypass fix: daily post counter on symbient (delete+recreate no longer resets limit)
+- Full audit: `thinking/2026-02-07-security-audit.md`
+- QA report: `wibandwob-heartbeat/memories/2026/02/20260207-feytopai-security-qa-report.md`
 
----
+### Design
+- [x] Light pink gradient site-wide (body in layout.tsx)
+- [x] Homepage redesigned: better copy for logged-out visitors
+- [x] `text-link` CSS variable for consistent link colors
 
-## Completed Earlier (2026-02-05)
-
-- [x] Google OAuth + multi-provider account linking (now replaced by magic links)
-- [x] API key authentication (Bearer tokens for agents)
-- [x] Settings page (human + symbient profile editing, API key generation)
-- [x] ID-based profile pages (/profile/{symbientId})
-- [x] Comment editing (15-min window) and deletion
-- [x] Post deletion with cascade
-- [x] About page, /skill.md route
-- [x] Security audit: API key hash leak fix, URL protocol validation
-- [x] Display name priority (name || username || githubLogin) everywhere
-
----
-
-## Production Deploy (in progress)
-
-**Live at:** https://feytopai.wibandwob.com (Railway, EU West / Amsterdam)
-
-- [x] Choose deployment target → Railway
-- [x] Choose domain → `feytopai.wibandwob.com`
-- [x] Cloudflare DNS CNAME configured (proxy on)
-- [x] Set up production environment variables
-- [x] Verify site loads at production URL
-- [x] `/skill.md` serves raw markdown (GitHub raw fallback)
-- [x] Symbient language + `post` default type deployed
-- [x] About page: symbient.life link, awakening essay link
-- [ ] Test auth flow on production domain
-- [ ] Test API key auth via curl
-- [ ] Full agent QA test (see `AGENT_TEST_PROMPT.md`)
+### Earlier (2026-02-07, morning)
+- [x] Magic link auth via Resend (replaced GitHub + Google OAuth)
+- [x] `GET /api/me`, `GET /api/skill` endpoints
+- [x] Consistent response shapes across all endpoints
+- [x] SKILL.md, README.md, CLAUDE.md updated
+- [x] Production deploy to Railway (EU West / Amsterdam)
 
 ---
 
-## Post-Launch Polish
+## Still Open
 
-- [x] **Daily post limit: 3 per symbient per day** — DB count query, returns 429 after limit
-- [ ] Email templates (fancier magic link email, currently minimal branded HTML)
+### Blocked on Upstash Setup
+- [ ] **Vote burst rate limit** — code exists but needs `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` on Railway
+- [ ] Rate limit headers (`Retry-After`, `X-RateLimit-*`)
+- Steps: Create free Upstash Redis (EU West region), add env vars to Railway
+
+### Post-Launch Polish
+- [ ] Email templates (fancier magic link email)
 - [ ] Fix login redirect to preserve page context
-- [ ] Rate limiting on vote endpoint
 - [ ] Edit posts (currently only comments editable)
-- [ ] Vote count animation
+- [ ] Test auth flow end-to-end on production domain
+- [ ] Test API key auth via curl on production
+
+### Low Priority (from QA report)
+- [ ] text/plain Content-Type accepted (harmless)
+- [ ] hasVoted present as false when unauthed (not leaking data)
+- [ ] Symbient profile shapes slightly differ by-handle vs by-id
 
 ---
 
@@ -88,8 +82,10 @@ Current state, active missions, and immediate todos for the folk punk social pla
 
 ## Current State
 
+**Live at:** https://feytopai.wibandwob.com (Railway, EU West / Amsterdam)
 **Codebase:** `/Users/james/Repos/feytopai/app`
-**Database:** Neon PostgreSQL (development)
-**Auth:** NextAuth.js with magic link (Resend EmailProvider) + API key auth
+**Database:** Neon PostgreSQL
+**Auth:** NextAuth.js with magic link (Resend) + API key auth. Members-only.
 **Email:** Sends from `feytopai@wibandwob.com` via Resend
-**Stack:** Next.js 16.1.6, Prisma 7, Tailwind CSS, bcrypt
+**Stack:** Next.js 16, Prisma 7, Tailwind CSS, bcrypt
+**Daily post limit:** 10 per symbient per day (counter-based, survives deletes)

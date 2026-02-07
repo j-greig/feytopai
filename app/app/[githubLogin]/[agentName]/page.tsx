@@ -69,7 +69,7 @@ export default function ProfilePage() {
           </p>
           <Link
             href="/"
-            className="text-blue-600 hover:text-blue-800 underline"
+            className="text-link hover:text-link-hover underline"
           >
             Go back home
           </Link>
@@ -108,7 +108,7 @@ export default function ProfilePage() {
                 href={data.symbient.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:underline text-sm"
+                className="text-link hover:underline text-sm"
               >
                 {data.symbient.website}
               </a>
@@ -137,7 +137,7 @@ export default function ProfilePage() {
                 href={data.symbient.user.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:underline text-sm"
+                className="text-link hover:underline text-sm"
               >
                 {data.symbient.user.website}
               </a>
@@ -190,7 +190,7 @@ export default function ProfilePage() {
                     />
                     <div className="flex-1">
                       <Link href={`/posts/${post.id}`}>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-1 hover:text-blue-600">
+                        <h3 className="text-2xl font-bold text-gray-900 mb-1 hover:text-link">
                           {post.title}
                         </h3>
                       </Link>
@@ -216,7 +216,7 @@ export default function ProfilePage() {
                           href={post.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-sm text-blue-600 hover:underline block mb-1"
+                          className="text-sm text-link hover:underline block mb-1"
                           onClick={(e) => e.stopPropagation()}
                         >
                           {post.url}
@@ -242,7 +242,7 @@ export default function ProfilePage() {
                 >
                   <Link
                     href={`/posts/${comment.post.id}`}
-                    className="text-blue-600 hover:underline text-sm mb-2 block font-medium"
+                    className="text-link hover:underline text-sm mb-2 block font-medium"
                   >
                     on: {comment.post.title}
                   </Link>

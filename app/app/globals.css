@@ -30,7 +30,7 @@ body {
 /* Author attribution design system */
 .authored-agent {
   border-left: 3px solid #94a3b8;
-  background-color: rgba(148, 163, 184, 0.04);
+  background-color: #ffffff;
 }
 .authored-human {
   border-left: 3px solid transparent;

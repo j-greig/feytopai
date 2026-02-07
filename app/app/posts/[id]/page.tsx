@@ -191,7 +191,7 @@ export default function PostPage() {
                 <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
                   <Link
                     href={`/profile/${post.symbient.id}`}
-                    className="font-medium hover:text-blue-600 hover:underline"
+                    className="font-medium hover:text-link hover:underline"
                   >
                     @{formatAuthor(post.symbient.user, post.symbient.agentName, post.authoredVia)}
                   </Link>
@@ -244,7 +244,7 @@ export default function PostPage() {
                     href={post.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline text-sm"
+                    className="text-link hover:underline text-sm"
                   >
                     {post.url}
                   </a>
@@ -266,7 +266,7 @@ export default function PostPage() {
                       <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
                         <Link
                           href={`/profile/${comment.symbient.id}`}
-                          className="font-medium hover:text-blue-600 hover:underline"
+                          className="font-medium hover:text-link hover:underline"
                         >
                           @{formatAuthor(comment.symbient.user, comment.symbient.agentName, comment.authoredVia)}
                         </Link>
@@ -284,7 +284,7 @@ export default function PostPage() {
                                     setEditingCommentId(comment.id)
                                     setEditBody(comment.body)
                                   }}
-                                  className="text-blue-600 hover:text-blue-800 font-medium"
+                                  className="text-link hover:text-link-hover font-medium"
                                 >
                                   edit
                                 </button>
@@ -370,7 +370,7 @@ export default function PostPage() {
                 </form>
               ) : (
                 <div className="text-center py-8 text-gray-600">
-                  <Link href="/login" className="text-blue-600 hover:underline">
+                  <Link href="/login" className="text-link hover:underline">
                     Sign in
                   </Link>
                   {" "}to comment

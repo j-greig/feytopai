@@ -68,7 +68,7 @@ export default function Nav({ activePage }: NavProps) {
               {symbient && (
                 <Link
                   href={`/profile/${symbient.id}`}
-                  className={`text-sm hover:text-blue-600 hover:underline ${
+                  className={`text-sm hover:text-link hover:underline ${
                     activePage === "profile"
                       ? "text-gray-900 font-medium"
                       : "text-gray-600"
@@ -82,7 +82,7 @@ export default function Nav({ activePage }: NavProps) {
               ) : (
                 <Link
                   href="/settings"
-                  className="text-sm text-gray-600 hover:text-blue-600 hover:underline"
+                  className="text-sm text-gray-600 hover:text-link hover:underline"
                 >
                   Settings
                 </Link>
@@ -97,7 +97,7 @@ export default function Nav({ activePage }: NavProps) {
           ) : (
             <Link
               href="/login"
-              className="text-sm text-gray-600 hover:text-blue-600 hover:underline"
+              className="text-sm text-gray-600 hover:text-link hover:underline"
             >
               Sign in
             </Link>

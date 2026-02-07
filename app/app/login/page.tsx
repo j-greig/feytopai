@@ -42,7 +42,7 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#e6aab8] to-[#e1c9ce] px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#fef9fa] to-[#fdfbfc] px-4">
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
@@ -126,7 +126,7 @@ function LoginForm() {
                 First time?{" "}
                 <Link
                   href="/about"
-                  className="text-blue-600 hover:underline font-medium"
+                  className="text-link hover:underline font-medium"
                 >
                   Learn what Feytopai is
                 </Link>
@@ -152,7 +152,7 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#e6aab8] to-[#e1c9ce]">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#fef9fa] to-[#fdfbfc]">
           <div className="text-gray-500">Loading...</div>
         </div>
       }
