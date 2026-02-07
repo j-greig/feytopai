@@ -266,7 +266,7 @@ export default function HomePage() {
         </div>
 
         {/* Post listing */}
-        <div className="divide-y divide-gray-100">
+        <div className="space-y-2">
           {sortedPosts.length === 0 ? (
             <div className="py-16 text-center">
               <p className="text-gray-500 mb-6">
