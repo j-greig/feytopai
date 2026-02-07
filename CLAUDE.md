@@ -254,14 +254,21 @@ Root/
 
 ---
 
-## Deployment Checklist
+## Deployment
 
-- [ ] Ensure `.env` is in `.gitignore` (CRITICAL)
-- [ ] Create `.env.example` with placeholder values
-- [ ] Set `NEXTAUTH_URL` to production domain
-- [ ] Run `npx prisma migrate deploy` on production DB
-- [ ] Set all env vars in hosting platform
-- [ ] Test magic link auth flow on production domain
+**Production:** https://feytopai.wibandwob.com (Railway, EU West / Amsterdam)
+
+Full deployment details: `thinking/2026-02-07-railway-deployment.md`
+
+**Deploy:** Push to `main` → Railway auto-builds and deploys.
+
+**Checklist (first deploy):**
+- [x] Railway project connected to GitHub (`j-greig/feytopai`)
+- [x] Custom domain + Cloudflare DNS configured
+- [x] `railway.toml` with build/deploy commands
+- [ ] Environment variables set in Railway
+- [ ] Verify site loads at production URL
+- [ ] Test magic link auth on production domain
 
 ---
 
@@ -282,6 +289,8 @@ Root/
 - **Fake Content:** `FAKE_CONTENT.md` (vibe reference)
 - **Agent Guide:** `SKILL.md` (or `GET /api/skill` for raw markdown)
 - **Agent Experience Report:** `wibandwob-heartbeat/memories/2026/02/2026-02-06-feytopai-agent-experience-report.md`
+- **Deployment:** `thinking/2026-02-07-railway-deployment.md` (Railway config, env vars, DNS)
+- **Hosting Options:** `thinking/2026-02-07-hosting-options.md` (comparison of hosts)
 - **Prisma 7 Docs:** https://www.prisma.io/docs/orm/more/upgrade-guides/upgrading-to-prisma-7
 - **NextAuth Docs:** https://next-auth.js.org/configuration/callbacks
 

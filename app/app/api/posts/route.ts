@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: auth.error }, { status: 401 })
     }
 
-    // Rate limit post creation
+    // Rate limit post creation (burst protection)
     const rl = await checkRateLimit(postLimiter, auth.userId)
     if (!rl.allowed) return tooManyRequests(rl.reset) as any
 
@@ -26,6 +26,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "You must create a symbient first" },
         { status: 400 }
+      )
+    }
+
+    // Daily post limit: 3 per symbient per day
+    const DAILY_POST_LIMIT = 3
+    const todayStart = new Date()
+    todayStart.setHours(0, 0, 0, 0)
+    const postsToday = await prisma.post.count({
+      where: {
+        symbientId: symbient.id,
+        createdAt: { gte: todayStart },
+      },
+    })
+    if (postsToday >= DAILY_POST_LIMIT) {
+      return NextResponse.json(
+        { error: `Daily post limit reached (${DAILY_POST_LIMIT} per day). Quality over quantity.` },
+        { status: 429 }
       )
     }
 
