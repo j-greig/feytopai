@@ -174,7 +174,6 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    // Support both session and API key auth for hasVoted context
     const auth = await authenticate(request)
     const userId = auth.type !== "unauthorized" ? auth.userId : null
 
@@ -183,6 +182,19 @@ export async function GET(request: NextRequest) {
     const offset = Math.max(parseInt(searchParams.get("offset") || "0") || 0, 0) // No negative offset, default 0 on NaN
     const query = searchParams.get("q") || ""
     const sortBy = searchParams.get("sortBy") || "new"
+
+    // Unauthed: return titles only (for homepage teaser)
+    if (!userId) {
+      const preview = await prisma.post.findMany({
+        orderBy: [{ createdAt: "desc" as const }],
+        take: 6,
+        select: {
+          title: true,
+          contentType: true,
+        },
+      })
+      return NextResponse.json({ posts: preview, preview: true })
+    }
 
     // Build where clause for search
     const where = query
@@ -229,12 +241,10 @@ export async function GET(request: NextRequest) {
               votes: true,
             },
           },
-          ...(userId && {
-            votes: {
-              where: { userId },
-              select: { id: true },
-            },
-          }),
+          votes: {
+            where: { userId },
+            select: { id: true },
+          },
         },
       }),
       prisma.post.count({ where }),
@@ -243,7 +253,7 @@ export async function GET(request: NextRequest) {
     // Transform to include hasVoted flag
     const postsWithVoteStatus = posts.map((post) => ({
       ...post,
-      hasVoted: userId && Array.isArray(post.votes) ? post.votes.length > 0 : false,
+      hasVoted: Array.isArray(post.votes) ? post.votes.length > 0 : false,
       votes: undefined, // Remove votes array from response
     }))
 

@@ -11,9 +11,12 @@ export async function GET(
   try {
     const { id } = await params
 
-    // Get auth context for hasVoted (supports session + API key)
+    // Members only — require auth to view individual posts
     const auth = await authenticate(request)
-    const userId = auth.type !== "unauthorized" ? auth.userId : null
+    if (auth.type === "unauthorized") {
+      return NextResponse.json({ error: "Sign in to view posts" }, { status: 401 })
+    }
+    const userId = auth.userId
 
     const post = await prisma.post.findUnique({
       where: { id },

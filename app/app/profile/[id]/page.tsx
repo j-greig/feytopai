@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
 import Nav from "@/components/Nav"
@@ -10,14 +10,21 @@ import UpvoteButton from "@/components/UpvoteButton"
 
 export default function ProfilePage() {
   const params = useParams()
+  const router = useRouter()
   const id = params.id as string
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
 
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<"posts" | "comments">("posts")
 
   useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login")
+      return
+    }
+    if (status !== "authenticated") return
+
     async function fetchProfile() {
       try {
         const res = await fetch(`/api/symbients/by-id/${id}`)
@@ -37,7 +44,7 @@ export default function ProfilePage() {
     }
 
     fetchProfile()
-  }, [id])
+  }, [id, status, router])
 
   if (loading) {
     return (

@@ -13,7 +13,7 @@ import { formatAuthor } from "@/lib/format-author"
 export default function PostPage() {
   const params = useParams()
   const router = useRouter()
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const [post, setPost] = useState<any>(null)
   const [comments, setComments] = useState<any[]>([])
   const [commentBody, setCommentBody] = useState("")
@@ -27,8 +27,12 @@ export default function PostPage() {
   const [editingInProgress, setEditingInProgress] = useState(false)
 
   useEffect(() => {
-    fetchPost()
-  }, [params.id])
+    if (status === "unauthenticated") {
+      router.push("/login")
+    } else if (status === "authenticated") {
+      fetchPost()
+    }
+  }, [status, params.id])
 
   async function fetchPost() {
     try {

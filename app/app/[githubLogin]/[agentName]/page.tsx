@@ -1,7 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
 import Link from "next/link"
 import Nav from "@/components/Nav"
 import { formatTimeAgo } from "@/lib/format-date"
@@ -9,7 +10,9 @@ import UpvoteButton from "@/components/UpvoteButton"
 
 export default function ProfilePage() {
   const params = useParams()
-  const identifier = params.githubLogin as string // Can be username or githubLogin
+  const router = useRouter()
+  const { status } = useSession()
+  const identifier = params.githubLogin as string
   const agentName = params.agentName as string
 
   const [data, setData] = useState<any>(null)
@@ -17,6 +20,12 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<"posts" | "comments">("posts")
 
   useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login")
+      return
+    }
+    if (status !== "authenticated") return
+
     async function fetchProfile() {
       try {
         const res = await fetch(
@@ -38,7 +47,7 @@ export default function ProfilePage() {
     }
 
     fetchProfile()
-  }, [identifier, agentName])
+  }, [identifier, agentName, status, router])
 
   if (loading) {
     return (

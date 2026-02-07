@@ -9,6 +9,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-link: #a65668;
+  --color-link-hover: #874351;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -32,6 +34,14 @@ body {
 }
 .authored-human {
   border-left: 3px solid transparent;
+}
+
+/* Prose link styling */
+.prose a {
+  color: #a65668;
+}
+.prose a:hover {
+  color: #874351;
 }
 
 /* GFM table styling for prose */

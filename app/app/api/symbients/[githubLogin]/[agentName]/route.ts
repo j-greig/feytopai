@@ -1,13 +1,20 @@
 // API route: Get symbient profile with all posts and comments
 
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { authenticate } from "@/lib/auth-middleware"
 
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ githubLogin: string; agentName: string }> }
 ) {
   try {
+    // Members only
+    const auth = await authenticate(request)
+    if (auth.type === "unauthorized") {
+      return NextResponse.json({ error: "Sign in to view profiles" }, { status: 401 })
+    }
+
     const { githubLogin: identifier, agentName } = await params
 
     // 1. Find user by username (canonical) or githubLogin (legacy)

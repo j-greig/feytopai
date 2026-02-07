@@ -1,13 +1,20 @@
 // API route: Get symbient profile by ID (stable URL regardless of name changes)
 
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { authenticate } from "@/lib/auth-middleware"
 
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Members only
+    const auth = await authenticate(request)
+    if (auth.type === "unauthorized") {
+      return NextResponse.json({ error: "Sign in to view profiles" }, { status: 401 })
+    }
+
     const { id } = await params
 
     const symbient = await prisma.symbient.findUnique({
