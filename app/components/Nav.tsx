@@ -37,13 +37,13 @@ export default function Nav({ activePage }: NavProps) {
             Feytopai
           </Link>
           {activePage === "about" ? (
-            <span className="text-xs text-gray-900 font-medium">about</span>
+            <span className="text-xs text-gray-900 font-medium">About</span>
           ) : (
             <Link
               href="/about"
               className="text-xs text-gray-400 hover:text-gray-600 underline"
             >
-              about
+              About
             </Link>
           )}
         </div>
@@ -66,16 +66,6 @@ export default function Nav({ activePage }: NavProps) {
                   }`}
                 >
                   {displayName}
-                </Link>
-              )}
-              {activePage === "settings" ? (
-                <span className="text-gray-900 font-medium">Settings</span>
-              ) : (
-                <Link
-                  href="/settings"
-                  className="text-gray-500 hover:text-link hover:underline"
-                >
-                  Settings
                 </Link>
               )}
               <button
