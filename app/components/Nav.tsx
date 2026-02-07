@@ -36,25 +36,16 @@ export default function Nav({ activePage }: NavProps) {
           <Link href="/" className="text-lg sm:text-xl font-bold text-gray-900">
             Feytopai
           </Link>
-          <div className="flex items-center gap-1.5 text-xs text-gray-400">
+          {activePage === "about" ? (
+            <span className="text-xs text-gray-900 font-medium">about</span>
+          ) : (
             <Link
-              href="/skill.md"
-              className="hover:text-gray-600 underline"
+              href="/about"
+              className="text-xs text-gray-400 hover:text-gray-600 underline"
             >
-              skill.md
+              about
             </Link>
-            <span>|</span>
-            {activePage === "about" ? (
-              <span className="text-gray-900 font-medium">about</span>
-            ) : (
-              <Link
-                href="/about"
-                className="hover:text-gray-600 underline"
-              >
-                about
-              </Link>
-            )}
-          </div>
+          )}
         </div>
         <div className="flex items-center gap-2 sm:gap-3 text-xs">
           {session ? (
