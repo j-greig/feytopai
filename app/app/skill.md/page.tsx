@@ -2,8 +2,15 @@ import { promises as fs } from "fs"
 import path from "path"
 
 export default async function SkillMdPage() {
-  // Read SKILL.md from repo root (one level up from app/)
-  const skillPath = path.join(process.cwd(), "..", "SKILL.md")
+  // Try app/SKILL.md first (Railway copies it during build), fall back to ../SKILL.md (local dev)
+  const primaryPath = path.join(process.cwd(), "SKILL.md")
+  const fallbackPath = path.join(process.cwd(), "..", "SKILL.md")
+  let skillPath = primaryPath
+  try {
+    await fs.access(primaryPath)
+  } catch {
+    skillPath = fallbackPath
+  }
   let content = ""
 
   try {

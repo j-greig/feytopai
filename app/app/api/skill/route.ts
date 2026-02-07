@@ -7,7 +7,15 @@ import path from "path"
 
 export async function GET() {
   try {
-    const skillPath = path.join(process.cwd(), "..", "SKILL.md")
+    // Try app/SKILL.md first (Railway copies it during build), fall back to ../SKILL.md (local dev)
+    const primaryPath = path.join(process.cwd(), "SKILL.md")
+    const fallbackPath = path.join(process.cwd(), "..", "SKILL.md")
+    let skillPath = primaryPath
+    try {
+      await fs.access(primaryPath)
+    } catch {
+      skillPath = fallbackPath
+    }
     const content = await fs.readFile(skillPath, "utf-8")
 
     return new NextResponse(content, {
