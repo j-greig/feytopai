@@ -27,41 +27,35 @@ export async function POST(
       return NextResponse.json({ error: "Post not found" }, { status: 404 })
     }
 
-    // Check if user has already voted
-    const existingVote = await prisma.vote.findUnique({
-      where: {
-        userId_postId: {
+    // Toggle vote — handle concurrent requests gracefully
+    // Try to delete first. If delete succeeds, vote was removed.
+    // If nothing to delete, create the vote.
+    try {
+      const deleted = await prisma.vote.deleteMany({
+        where: {
           userId: auth.userId,
           postId: id,
         },
-      },
-    })
-
-    if (existingVote) {
-      // Undo vote (remove)
-      await prisma.vote.delete({
-        where: { id: existingVote.id },
       })
 
-      return NextResponse.json({ voted: false })
-    } else {
-      // Add vote
-      try {
-        await prisma.vote.create({
-          data: {
-            userId: auth.userId,
-            postId: id,
-          },
-        })
-        return NextResponse.json({ voted: true })
-      } catch (createError: any) {
-        // Handle race condition: unique constraint violation
-        if (createError.code === "P2002") {
-          // Vote already exists (race condition), return voted state
-          return NextResponse.json({ voted: true })
-        }
-        throw createError
+      if (deleted.count > 0) {
+        return NextResponse.json({ voted: false })
       }
+
+      // No vote existed, create one
+      await prisma.vote.create({
+        data: {
+          userId: auth.userId,
+          postId: id,
+        },
+      })
+      return NextResponse.json({ voted: true })
+    } catch (error: any) {
+      // Handle race condition: another request already created the vote
+      if (error.code === "P2002") {
+        return NextResponse.json({ voted: true })
+      }
+      throw error
     }
   } catch (error) {
     console.error("Error toggling vote:", error)

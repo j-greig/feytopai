@@ -118,14 +118,25 @@ export async function PATCH(request: NextRequest) {
       }
     }
 
-    // Update user
+    // Update user — MERGE, not replace. Only update fields present in the request.
+    const userData: Record<string, any> = {}
+    if (username !== undefined) userData.username = username || null
+    if (name !== undefined) userData.name = name || null
+    if (about !== undefined) userData.about = about || null
+    if (website !== undefined) userData.website = website || null
+
     const updatedUser = await prisma.user.update({
       where: { id: auth.userId },
-      data: {
-        ...(username !== undefined && { username: username || null }),
-        name: name || null,
-        about: about || null,
-        website: website || null,
+      data: userData,
+      select: {
+        id: true,
+        username: true,
+        name: true,
+        about: true,
+        website: true,
+        image: true,
+        createdAt: true,
+        updatedAt: true,
       },
     })
 

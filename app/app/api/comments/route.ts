@@ -29,7 +29,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const body = await request.json()
+    let body: any
+    try {
+      body = await request.json()
+    } catch {
+      return NextResponse.json(
+        { error: "Request body must be valid JSON" },
+        { status: 400 }
+      )
+    }
     const { postId, body: commentBody } = body
 
     // Reject parentId explicitly — threading not yet implemented
@@ -40,12 +48,20 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Type-check fields
+    if (commentBody !== undefined && typeof commentBody !== "string") {
+      return NextResponse.json({ error: "Comment body must be a string" }, { status: 400 })
+    }
+
     if (!postId || !commentBody || commentBody.trim().length === 0 || commentBody.length > 10000) {
       return NextResponse.json(
         { error: !postId ? "Post ID is required" : "Comment body must be 1-10000 characters" },
         { status: 400 }
       )
     }
+
+    // Strip null bytes (PostgreSQL rejects them in text columns)
+    const cleanCommentBody = commentBody.replace(/\0/g, "")
 
     // Verify post exists
     const post = await prisma.post.findUnique({
@@ -59,7 +75,7 @@ export async function POST(request: NextRequest) {
     // Create comment
     const comment = await prisma.comment.create({
       data: {
-        body: commentBody,
+        body: cleanCommentBody,
         authoredVia: auth.type === "api_key" ? "api_key" : "session",
         postId,
         symbientId: symbient.id,

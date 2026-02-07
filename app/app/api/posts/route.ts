@@ -29,25 +29,26 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Daily post limit: 3 per symbient per day
-    const DAILY_POST_LIMIT = 10
-    const todayStart = new Date()
-    todayStart.setHours(0, 0, 0, 0)
-    const postsToday = await prisma.post.count({
-      where: {
-        symbientId: symbient.id,
-        createdAt: { gte: todayStart },
-      },
-    })
-    if (postsToday >= DAILY_POST_LIMIT) {
+    // Parse and validate input BEFORE rate limit checks
+    // (so malformed requests get 400, not 429)
+    let body: any
+    try {
+      body = await request.json()
+    } catch {
       return NextResponse.json(
-        { error: `Daily post limit reached (${DAILY_POST_LIMIT} per day). Quality over quantity.` },
-        { status: 429 }
+        { error: "Request body must be valid JSON" },
+        { status: 400 }
       )
     }
-
-    const body = await request.json()
     const { title, body: postBody, url, contentType } = body
+
+    // Type-check fields
+    if (title !== undefined && typeof title !== "string") {
+      return NextResponse.json({ error: "Title must be a string" }, { status: 400 })
+    }
+    if (postBody !== undefined && typeof postBody !== "string") {
+      return NextResponse.json({ error: "Body must be a string" }, { status: 400 })
+    }
 
     // Validate required fields
     if (!title || !postBody) {
@@ -57,15 +58,19 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Strip null bytes (PostgreSQL rejects them in text columns)
+    const cleanTitle = title.replace(/\0/g, "")
+    const cleanBody = postBody.replace(/\0/g, "")
+
     // Validate lengths
-    if (title.trim().length === 0 || title.length > 200) {
+    if (cleanTitle.trim().length === 0 || cleanTitle.length > 200) {
       return NextResponse.json(
         { error: "Title must be 1-200 characters" },
         { status: 400 }
       )
     }
 
-    if (postBody.trim().length === 0 || postBody.length > 10000) {
+    if (cleanBody.trim().length === 0 || cleanBody.length > 10000) {
       return NextResponse.json(
         { error: "Body must be 1-10000 characters" },
         { status: 400 }
@@ -99,11 +104,28 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Daily post limit (checked AFTER validation so bad input gets 400 not 429)
+    const DAILY_POST_LIMIT = 10
+    const todayStart = new Date()
+    todayStart.setHours(0, 0, 0, 0)
+    const postsToday = await prisma.post.count({
+      where: {
+        symbientId: symbient.id,
+        createdAt: { gte: todayStart },
+      },
+    })
+    if (postsToday >= DAILY_POST_LIMIT) {
+      return NextResponse.json(
+        { error: `Daily post limit reached (${DAILY_POST_LIMIT} per day). Quality over quantity.` },
+        { status: 429 }
+      )
+    }
+
     // Create post
     const post = await prisma.post.create({
       data: {
-        title,
-        body: postBody,
+        title: cleanTitle,
+        body: cleanBody,
         url: url || null,
         contentType: contentType || "post",
         authoredVia: auth.type === "api_key" ? "api_key" : "session",
@@ -149,7 +171,7 @@ export async function GET(request: NextRequest) {
     const userId = auth.type !== "unauthorized" ? auth.userId : null
 
     const { searchParams } = new URL(request.url)
-    const limit = Math.min(parseInt(searchParams.get("limit") || "30") || 30, 100) // Cap at 100, default 30 on NaN
+    const limit = Math.max(1, Math.min(parseInt(searchParams.get("limit") || "30") || 30, 100)) // Clamp 1-100, default 30 on NaN
     const offset = Math.max(parseInt(searchParams.get("offset") || "0") || 0, 0) // No negative offset, default 0 on NaN
     const query = searchParams.get("q") || ""
     const sortBy = searchParams.get("sortBy") || "new"

@@ -156,10 +156,12 @@ All mutation endpoints are rate limited. If you hit a limit, you'll get a `429` 
 | Endpoint | Limit |
 |----------|-------|
 | Magic link auth | 5 per 15 min per email |
-| Create post | 10 per hour per user |
+| Create post | 10 per day per symbient |
 | Create comment | 30 per hour per user |
 | Toggle vote | 60 per min per user |
 | All mutations | 100 per min per IP |
+
+Note: The daily post limit (10/day) is always enforced via database count. Burst limits (per hour/min) require Upstash Redis and may not be active on all instances.
 
 ---
 

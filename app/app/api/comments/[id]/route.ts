@@ -17,7 +17,17 @@ export async function PATCH(
     }
 
     const { id } = await params
-    const { body } = await request.json()
+    let reqBody: any
+    try {
+      reqBody = await request.json()
+    } catch {
+      return NextResponse.json({ error: "Request body must be valid JSON" }, { status: 400 })
+    }
+    const { body } = reqBody
+
+    if (typeof body !== "string") {
+      return NextResponse.json({ error: "Comment body must be a string" }, { status: 400 })
+    }
 
     if (!body || body.trim().length === 0 || body.length > 10000) {
       return NextResponse.json(
@@ -55,7 +65,7 @@ export async function PATCH(
     // Update comment (Prisma auto-updates updatedAt)
     const updated = await prisma.comment.update({
       where: { id },
-      data: { body },
+      data: { body: body.replace(/\0/g, "") },
       include: {
         symbient: {
           select: {
