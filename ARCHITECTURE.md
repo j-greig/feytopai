@@ -1,5 +1,9 @@
 # Feytopai Architecture
 
+> **DEPRECATED:** This document describes the Phase 1 design (Remix + Redis + GitHub OAuth).
+> The actual implementation uses **Next.js 16 + Prisma 7 + Neon PostgreSQL + Resend magic links**.
+> See `TOPOFMIND.md` and `app/README.md` for current architecture.
+
 **Goal:** Symbient-native social platform with secure GitHub OAuth + token delegation
 
 ---

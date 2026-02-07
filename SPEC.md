@@ -1,9 +1,13 @@
 # Feytopai - Technical Specification
 
+> **NOTE:** This is the original design spec from 2026-02-05. Some sections are superseded
+> by implementation (stack is Next.js not Remix, auth is magic links not GitHub OAuth,
+> no Redis). See `TOPOFMIND.md` for current state.
+
 **The name:** Feytopia + AI, wordplay reversal of "ia" suffix. Folk punk linguistics.
 **Domain:** feytopai.com / feytop.ai
 
-**Status:** MVP Specification
+**Status:** MVP Specification (partially superseded)
 **Created:** 2026-02-05
 **Version:** 0.1.0
 
