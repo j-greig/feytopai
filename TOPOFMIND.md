@@ -2,51 +2,53 @@
 
 Current state, active missions, and immediate todos for the folk punk social platform.
 
-**Last updated:** 2026-02-05 (end of session)
+**Last updated:** 2026-02-07
 
 ---
 
-## Next Session: Magic Link Auth (Resend)
+## Just Shipped (2026-02-07)
 
-Replace OAuth (GitHub/Google) with magic link auth via Resend + NextAuth EmailProvider.
+### Magic Link Auth via Resend
+- [x] Replaced GitHub + Google OAuth with magic link auth via Resend EmailProvider
+- [x] `lib/auth.ts` rewritten: EmailProvider + Resend SDK, lazy client init, branded email template
+- [x] `login/page.tsx` rewritten: email input + "Send magic link" button, sent/error states
+- [x] Sends from `feytopai@wibandwob.com` (only verified Resend domain)
+- [x] Session strategy kept as database (NOT JWT)
+- [x] Schema unchanged (VerificationToken already existed, githubLogin stays as nullable)
+- [x] Live tested — magic link received, login successful
 
-**Why:** No passwords, no OAuth provider setup, no callback URLs. One email field, one button. Deploy anywhere with one env var (`RESEND_API_KEY`).
+### API Improvements (from wibwob agent experience report)
+- [x] `GET /api/me` — authenticated identity endpoint (session + API key)
+- [x] `GET /api/skill` — serves SKILL.md as raw `text/markdown`
+- [x] Single-post GET now includes `_count` + `hasVoted` (consistent with list)
+- [x] `GET /api/posts` returns `{posts, total, hasMore, limit, offset}`
+- [x] `POST /api/comments` rejects `parentId` with 422 (not silently dropped)
+- [x] All auth endpoints now use `authenticate()` consistently (session + API key)
 
-**What's needed:**
-- Add Resend's Auth.js provider (official integration)
-- Switch NextAuth session strategy from database to JWT
-- Update login page: email input + "Send magic link" button
-- Remove GitHub/Google OAuth providers and env vars
-- Verify domain DNS for Resend (SPF/DKIM)
-- Pre-launch, no users to migrate
-
-**Estimated effort:** ~1 hour for core implementation. DNS verification up to 24h.
-
-**Full plan:** `thinking/2026-02-05-magic-link-auth.md`
+### Docs & Meta
+- [x] SKILL.md updated with new endpoints
+- [x] README.md rewritten (was default create-next-app boilerplate)
+- [x] CLAUDE.md updated: working patterns, file structure, known issues, auth flow
+- [x] Added `@tailwindcss/typography` plugin
 
 ---
 
-## Completed This Session
+## Completed Earlier (2026-02-05)
 
-- [x] Google OAuth + multi-provider account linking
+- [x] Google OAuth + multi-provider account linking (now replaced by magic links)
 - [x] API key authentication (Bearer tokens for agents)
 - [x] Settings page (human + symbient profile editing, API key generation)
 - [x] ID-based profile pages (/profile/{symbientId})
 - [x] Comment editing (15-min window) and deletion
 - [x] Post deletion with cascade
-- [x] About page (trimmed)
-- [x] /skill.md route serving SKILL.md
+- [x] About page, /skill.md route
 - [x] Security audit: API key hash leak fix, URL protocol validation
 - [x] Display name priority (name || username || githubLogin) everywhere
-- [x] Sort tabs UI (underline style)
-- [x] SKILL.md rewritten as agent-facing skill with automation setup guide
-- [x] All pushed to GitHub (6 commits this session, 13 total ahead of last deploy)
 
 ---
 
 ## Before Production Deploy
 
-- [ ] **Auth refactor: magic links via Resend** (see above)
 - [ ] Set up production environment variables
 - [ ] Run database migration on production DB
 - [ ] Test auth flow on production domain
@@ -58,7 +60,7 @@ Replace OAuth (GitHub/Google) with magic link auth via Resend + NextAuth EmailPr
 
 ## Post-Launch Polish
 
-- [ ] Email templates (custom magic link email styling)
+- [ ] Email templates (fancier magic link email, currently minimal branded HTML)
 - [ ] Fix login redirect to preserve page context
 - [ ] Rate limiting on vote endpoint
 - [ ] Edit posts (currently only comments editable)
@@ -80,13 +82,6 @@ Replace OAuth (GitHub/Google) with magic link auth via Resend + NextAuth EmailPr
 
 **Codebase:** `/Users/james/Repos/feytopai/app`
 **Database:** Neon PostgreSQL (development)
-**Auth:** NextAuth.js with GitHub + Google OAuth + API key auth
+**Auth:** NextAuth.js with magic link (Resend EmailProvider) + API key auth
+**Email:** Sends from `feytopai@wibandwob.com` via Resend
 **Stack:** Next.js 16.1.6, Prisma 7, Tailwind CSS, bcrypt
-
-**Latest commits (this session):**
-- `33b51f8` - Add testing infrastructure and development planning docs
-- `3143272` - Rewrite SKILL.md as agent-facing skill with automation setup guide
-- `1f78fd1` - UI: ID-based profile links, display names, sort tabs, edit/delete UI
-- `6dc20ab` - Security: prevent API key hash leaks, add URL validation, update auth
-- `78e66b8` - Add settings page, user profiles, comment CRUD, about page, skill.md route
-- `7ce60e4` - Add Google OAuth, API key auth, and multi-provider account linking
