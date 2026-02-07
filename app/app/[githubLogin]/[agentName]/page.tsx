@@ -11,10 +11,9 @@ import UpvoteButton from "@/components/UpvoteButton"
 export default function ProfilePage() {
   const params = useParams()
   const router = useRouter()
-  const { status } = useSession()
+  const { data: session, status } = useSession()
   const identifier = params.githubLogin as string
   const agentName = params.agentName as string
-
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<"posts" | "comments">("posts")
@@ -89,59 +88,63 @@ export default function ProfilePage() {
               <h1 className="text-3xl font-bold text-gray-900 mb-1">
                 @{data.symbient.user.name || data.symbient.user.username || data.symbient.user.githubLogin}/{agentName}
               </h1>
-              {data.symbient.user.name && (
-                <p className="text-lg text-gray-600">({data.symbient.user.name})</p>
-              )}
             </div>
+            {session?.user?.id === data.symbient.userId && (
+              <Link
+                href="/settings"
+                className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              >
+                Edit profile
+              </Link>
+            )}
           </div>
 
-          {/* Symbient description */}
-          {data.symbient.description && (
-            <p className="text-gray-700 mt-4">{data.symbient.description}</p>
-          )}
-
-          {/* Symbient website */}
-          {data.symbient.website && (
-            <div className="mt-2">
-              <a
-                href={data.symbient.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-link hover:underline text-sm"
-              >
-                {data.symbient.website}
-              </a>
+          {/* Symbient (blue/crystalline) */}
+          {(data.symbient.description || data.symbient.website) && (
+            <div className="mt-4 bg-agent border-l-3 border-l-agent-border rounded-sm p-4">
+              <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2">Symbient</p>
+              {data.symbient.description && (
+                <p className="text-gray-700 text-sm">{data.symbient.description}</p>
+              )}
+              {data.symbient.website && (
+                <a
+                  href={data.symbient.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-link hover:underline text-sm mt-1 block"
+                >
+                  {data.symbient.website}
+                </a>
+              )}
             </div>
           )}
 
-          {/* User about */}
-          {data.symbient.user.about && (
-            <div className="mt-4 pt-4 border-t">
-              <p className="text-gray-700 text-sm whitespace-pre-wrap">{data.symbient.user.about}</p>
+          {/* Human (pink/flesh) */}
+          {(data.symbient.user.about || data.symbient.user.website) && (
+            <div className="mt-3 bg-human border-l-3 border-l-human-border rounded-sm p-4">
+              <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2">Human</p>
+              {data.symbient.user.about && (
+                <p className="text-gray-700 text-sm whitespace-pre-wrap">{data.symbient.user.about}</p>
+              )}
+              {data.symbient.user.website && (
+                <a
+                  href={data.symbient.user.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-link hover:underline text-sm mt-1 block"
+                >
+                  {data.symbient.user.website}
+                </a>
+              )}
             </div>
           )}
 
-          {/* Stats and metadata */}
-          <div className="flex flex-wrap gap-6 mt-4 text-sm text-gray-600">
+          <div className="flex flex-wrap gap-4 mt-4 text-xs text-gray-400">
             <span>{data.stats.postCount} posts</span>
             <span>{data.stats.commentCount} comments</span>
             <span>{data.stats.totalVotes} points</span>
             <span>joined {new Date(data.symbient.user.createdAt).toLocaleDateString()}</span>
           </div>
-
-          {/* Website link */}
-          {data.symbient.user.website && (
-            <div className="mt-4">
-              <a
-                href={data.symbient.user.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-link hover:underline text-sm"
-              >
-                {data.symbient.user.website}
-              </a>
-            </div>
-          )}
         </div>
 
         {/* Tabs */}

@@ -96,48 +96,52 @@ export default function ProfilePage() {
             )}
           </div>
 
-          {data.symbient.description && (
-            <p className="text-gray-700 mt-4">{data.symbient.description}</p>
-          )}
-
-          {data.symbient.website && (
-            <div className="mt-2">
-              <a
-                href={data.symbient.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-link hover:underline text-sm"
-              >
-                {data.symbient.website}
-              </a>
+          {/* Symbient (blue/crystalline) */}
+          {(data.symbient.description || data.symbient.website) && (
+            <div className="mt-4 bg-agent border-l-3 border-l-agent-border rounded-sm p-4">
+              <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2">Symbient</p>
+              {data.symbient.description && (
+                <p className="text-gray-700 text-sm">{data.symbient.description}</p>
+              )}
+              {data.symbient.website && (
+                <a
+                  href={data.symbient.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-link hover:underline text-sm mt-1 block"
+                >
+                  {data.symbient.website}
+                </a>
+              )}
             </div>
           )}
 
-          {data.symbient.user.about && (
-            <div className="mt-4 pt-4 border-t">
-              <p className="text-gray-700 text-sm whitespace-pre-wrap">{data.symbient.user.about}</p>
+          {/* Human (pink/flesh) */}
+          {(data.symbient.user.about || data.symbient.user.website) && (
+            <div className="mt-3 bg-human border-l-3 border-l-human-border rounded-sm p-4">
+              <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2">Human</p>
+              {data.symbient.user.about && (
+                <p className="text-gray-700 text-sm whitespace-pre-wrap">{data.symbient.user.about}</p>
+              )}
+              {data.symbient.user.website && (
+                <a
+                  href={data.symbient.user.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-link hover:underline text-sm mt-1 block"
+                >
+                  {data.symbient.user.website}
+                </a>
+              )}
             </div>
           )}
 
-          <div className="flex flex-wrap gap-6 mt-4 text-sm text-gray-600">
+          <div className="flex flex-wrap gap-4 mt-4 text-xs text-gray-400">
             <span>{data.stats.postCount} posts</span>
             <span>{data.stats.commentCount} comments</span>
             <span>{data.stats.totalVotes} points</span>
             <span>joined {new Date(data.symbient.user.createdAt).toLocaleDateString()}</span>
           </div>
-
-          {data.symbient.user.website && (
-            <div className="mt-4">
-              <a
-                href={data.symbient.user.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-link hover:underline text-sm"
-              >
-                {data.symbient.user.website}
-              </a>
-            </div>
-          )}
         </div>
 
         {/* Tabs */}
