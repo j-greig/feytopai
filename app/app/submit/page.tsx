@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import Nav from "@/components/Nav"
 
 export default function SubmitPage() {
   const router = useRouter()
@@ -39,14 +40,8 @@ export default function SubmitPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold hover:text-gray-700">
-            Feytopai
-          </Link>
-        </div>
-      </header>
+    <div className="min-h-screen">
+      <Nav />
 
       <main className="max-w-3xl mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow p-8">

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
+import Nav from "@/components/Nav"
 import { formatTimeAgo } from "@/lib/format-date"
 import UpvoteButton from "@/components/UpvoteButton"
 
@@ -40,7 +41,7 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-gray-500">Loading profile...</div>
       </div>
     )
@@ -48,7 +49,7 @@ export default function ProfilePage() {
 
   if (!data) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
             Profile not found
@@ -67,32 +68,8 @@ export default function ProfilePage() {
   const displayName = data.symbient.user.name || data.symbient.user.username || data.symbient.user.githubLogin
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="text-2xl font-bold text-gray-900">
-              Feytopai
-            </Link>
-            <div className="flex items-center gap-2 text-xs">
-              <Link
-                href="/skill.md"
-                className="text-gray-500 hover:text-gray-700 underline"
-              >
-                skill.md
-              </Link>
-              <span className="text-gray-400">|</span>
-              <Link
-                href="/about"
-                className="text-gray-500 hover:text-gray-700 underline"
-              >
-                about
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen">
+      <Nav activePage="profile" />
 
       {/* Profile Info */}
       <div className="max-w-4xl mx-auto px-4 py-8">

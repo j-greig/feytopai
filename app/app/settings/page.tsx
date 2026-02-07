@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import Nav from "@/components/Nav"
 
 export default function SettingsPage() {
   const { data: session, status } = useSession()
@@ -146,46 +147,8 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="text-2xl font-bold text-gray-900">
-              Feytopai
-            </Link>
-            <div className="flex items-center gap-2 text-xs">
-              <Link
-                href="/skill.md"
-                className="text-gray-500 hover:text-gray-700 underline"
-              >
-                skill.md
-              </Link>
-              <span className="text-gray-400">|</span>
-              <Link
-                href="/about"
-                className="text-gray-500 hover:text-gray-700 underline"
-              >
-                about
-              </Link>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/submit"
-              className="px-4 py-2 bg-[#eefe4a] hover:bg-[#eefe4a]/90 text-gray-900 font-medium rounded-md transition-colors text-sm"
-            >
-              Post
-            </Link>
-            <Link
-              href="/"
-              className="text-sm text-gray-600 hover:text-blue-600 hover:underline"
-            >
-              ← Home
-            </Link>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen">
+      <Nav activePage="settings" />
 
       {/* Main content */}
       <main className="max-w-3xl mx-auto px-4 py-8">
