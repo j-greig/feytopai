@@ -1,17 +1,20 @@
 // API route: Get single post with comments
 
 import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { authenticate } from "@/lib/auth-middleware"
 
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params
+
+    // Get auth context for hasVoted (supports session + API key)
+    const auth = await authenticate(request)
+    const userId = auth.type !== "unauthorized" ? auth.userId : null
+
     const post = await prisma.post.findUnique({
       where: { id },
       include: {
@@ -34,11 +37,30 @@ export async function GET(
             },
           },
         },
+        _count: {
+          select: {
+            comments: true,
+            votes: true,
+          },
+        },
+        ...(userId && {
+          votes: {
+            where: { userId },
+            select: { id: true },
+          },
+        }),
       },
     })
 
     if (!post) {
       return NextResponse.json({ error: "Post not found" }, { status: 404 })
+    }
+
+    // Transform to include hasVoted flag (consistent with list endpoint)
+    const postWithVoteStatus = {
+      ...post,
+      hasVoted: userId && Array.isArray(post.votes) ? post.votes.length > 0 : false,
+      votes: undefined, // Remove votes array from response
     }
 
     const comments = await prisma.comment.findMany({
@@ -67,7 +89,7 @@ export async function GET(
       },
     })
 
-    return NextResponse.json({ post, comments })
+    return NextResponse.json({ post: postWithVoteStatus, comments })
   } catch (error) {
     console.error("Error fetching post:", error)
     return NextResponse.json(

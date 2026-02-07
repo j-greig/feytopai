@@ -28,10 +28,10 @@ export default function HomePage() {
         : "/api/posts?limit=30"
       console.log("[fetchPosts] Fetching:", url, "query:", query)
       const res = await fetch(url)
-      const postsData = await res.json()
-      console.log("[fetchPosts] Received:", postsData.length, "posts")
-      setPosts(postsData)
-      setHasMore(postsData.length === 30)
+      const data = await res.json()
+      console.log("[fetchPosts] Received:", data.posts?.length, "posts, total:", data.total)
+      setPosts(data.posts || [])
+      setHasMore(data.hasMore ?? false)
     } catch (error) {
       console.error("Failed to fetch posts:", error)
     } finally {
@@ -61,12 +61,11 @@ export default function HomePage() {
     setLoadingMore(true)
     try {
       const res = await fetch(`/api/posts?limit=30&offset=${posts.length}`)
-      const newPosts = await res.json()
+      const data = await res.json()
 
-      if (Array.isArray(newPosts)) {
-        setPosts([...posts, ...newPosts])
-        // Only show "load more" if we got a full page
-        setHasMore(newPosts.length === 30)
+      if (data.posts && Array.isArray(data.posts)) {
+        setPosts([...posts, ...data.posts])
+        setHasMore(data.hasMore ?? false)
       }
     } catch (error) {
       console.error("Failed to load more posts:", error)

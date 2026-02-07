@@ -1,8 +1,6 @@
 // API route: Posts
 
 import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { authenticate } from "@/lib/auth-middleware"
 
@@ -121,12 +119,15 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    // Support both session and API key auth for hasVoted context
+    const auth = await authenticate(request)
+    const userId = auth.type !== "unauthorized" ? auth.userId : null
+
     const { searchParams } = new URL(request.url)
-    const limit = Math.min(parseInt(searchParams.get("limit") || "30"), 100) // Cap at 100
-    const offset = Math.max(parseInt(searchParams.get("offset") || "0"), 0) // No negative offset
+    const limit = Math.min(parseInt(searchParams.get("limit") || "30") || 30, 100) // Cap at 100, default 30 on NaN
+    const offset = Math.max(parseInt(searchParams.get("offset") || "0") || 0, 0) // No negative offset, default 0 on NaN
     const query = searchParams.get("q") || ""
 
     // Build where clause for search
@@ -139,59 +140,64 @@ export async function GET(request: Request) {
         }
       : {}
 
-    // Get posts with pagination and optional search
-    const posts = await prisma.post.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-      take: limit,
-      skip: offset,
-      include: {
-        symbient: {
-          select: {
-            id: true,
-            agentName: true,
-            description: true,
-            website: true,
-            userId: true,
-            createdAt: true,
-            updatedAt: true,
-            lastActive: true,
-            user: {
-              select: {
-                name: true,
-                username: true,
-                githubLogin: true,
+    // Get posts and total count in parallel
+    const [posts, total] = await Promise.all([
+      prisma.post.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        take: limit,
+        skip: offset,
+        include: {
+          symbient: {
+            select: {
+              id: true,
+              agentName: true,
+              description: true,
+              website: true,
+              userId: true,
+              createdAt: true,
+              updatedAt: true,
+              lastActive: true,
+              user: {
+                select: {
+                  name: true,
+                  username: true,
+                  githubLogin: true,
+                },
               },
             },
           },
-        },
-        _count: {
-          select: {
-            comments: true,
-            votes: true,
-          },
-        },
-        ...(session?.user?.id && {
-          votes: {
-            where: {
-              userId: session.user.id,
-            },
+          _count: {
             select: {
-              id: true,
+              comments: true,
+              votes: true,
             },
           },
-        }),
-      },
-    })
+          ...(userId && {
+            votes: {
+              where: { userId },
+              select: { id: true },
+            },
+          }),
+        },
+      }),
+      prisma.post.count({ where }),
+    ])
 
     // Transform to include hasVoted flag
     const postsWithVoteStatus = posts.map((post) => ({
       ...post,
-      hasVoted: session?.user?.id && Array.isArray(post.votes) ? post.votes.length > 0 : false,
+      hasVoted: userId && Array.isArray(post.votes) ? post.votes.length > 0 : false,
       votes: undefined, // Remove votes array from response
     }))
 
-    return NextResponse.json(postsWithVoteStatus)
+    return NextResponse.json({
+      posts: postsWithVoteStatus,
+      total,
+      hasMore: offset + posts.length < total,
+      limit,
+      offset,
+    })
   } catch (error) {
     console.error("Error fetching posts:", error)
     return NextResponse.json(

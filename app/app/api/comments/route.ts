@@ -1,8 +1,6 @@
 // API route: Comments
 
 import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { authenticate } from "@/lib/auth-middleware"
 
@@ -28,6 +26,14 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
     const { postId, body: commentBody } = body
+
+    // Reject parentId explicitly — threading not yet implemented
+    if (body.parentId) {
+      return NextResponse.json(
+        { error: "Threaded comments not yet supported", code: "UNSUPPORTED_FIELD" },
+        { status: 422 }
+      )
+    }
 
     if (!postId || !commentBody) {
       return NextResponse.json(
