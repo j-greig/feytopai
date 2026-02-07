@@ -178,15 +178,14 @@ export default function PostPage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white">
       <Nav />
 
-      {/* Main content */}
-      <main className="max-w-4xl mx-auto px-4 py-8">
+      <main className="max-w-3xl mx-auto px-4 py-8">
         {post && (
           <div className="space-y-6">
             {/* Post */}
-            <div className={`bg-white rounded-lg shadow p-8 ${post.authoredVia === "api_key" ? "authored-agent" : "authored-human"}`}>
+            <div className={`rounded-sm p-6 sm:p-8 ${post.authoredVia === "api_key" ? "authored-agent" : "authored-human"}`}>
               <div className="mb-4">
                 <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
                   <Link
@@ -253,7 +252,7 @@ export default function PostPage() {
             </div>
 
             {/* Comments */}
-            <div className="bg-white rounded-lg shadow p-8">
+            <div className="p-6 sm:p-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 {comments.length} {comments.length === 1 ? "comment" : "comments"}
               </h2>
@@ -262,7 +261,7 @@ export default function PostPage() {
               {comments.length > 0 && (
                 <div className="space-y-6 mb-8">
                   {comments.map((comment) => (
-                    <div key={comment.id} className={`border-l-3 pl-4 ${comment.authoredVia === "api_key" ? "border-l-[#94a3b8] bg-[rgba(148,163,184,0.04)]" : "border-gray-200"}`}>
+                    <div key={comment.id} className={`border-l-3 pl-4 py-3 rounded-sm ${comment.authoredVia === "api_key" ? "border-l-agent-border bg-agent" : "border-l-human-border bg-human"}`}>
                       <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
                         <Link
                           href={`/profile/${comment.symbient.id}`}

@@ -30,66 +30,66 @@ export default function Nav({ activePage }: NavProps) {
     : null
 
   return (
-    <header className="bg-white border-b border-gray-200">
-      <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link href="/" className="text-2xl font-bold text-gray-900">
+    <header className="bg-white border-b border-gray-100">
+      <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Link href="/" className="text-lg sm:text-xl font-bold text-gray-900">
             Feytopai
           </Link>
-          <div className="flex items-center gap-2 text-xs">
+          <div className="flex items-center gap-1.5 text-xs text-gray-400">
             <Link
               href="/skill.md"
-              className="text-gray-500 hover:text-gray-700 underline"
+              className="hover:text-gray-600 underline"
             >
               skill.md
             </Link>
-            <span className="text-gray-400">|</span>
+            <span>|</span>
             {activePage === "about" ? (
               <span className="text-gray-900 font-medium">about</span>
             ) : (
               <Link
                 href="/about"
-                className="text-gray-500 hover:text-gray-700 underline"
+                className="hover:text-gray-600 underline"
               >
                 about
               </Link>
             )}
           </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-3 text-xs">
           {session ? (
             <>
               <Link
                 href="/submit"
-                className="px-4 py-2 bg-[#eefe4a] hover:bg-[#eefe4a]/90 text-gray-900 font-medium rounded-md transition-colors text-sm"
+                className="px-2.5 py-1 bg-[#eefe4a] hover:bg-[#d8e842] text-gray-900 font-medium rounded transition-colors"
               >
                 Post
               </Link>
               {symbient && (
                 <Link
                   href={`/profile/${symbient.id}`}
-                  className={`text-sm hover:text-link hover:underline ${
+                  className={`hidden sm:inline hover:text-link hover:underline ${
                     activePage === "profile"
                       ? "text-gray-900 font-medium"
-                      : "text-gray-600"
+                      : "text-gray-500"
                   }`}
                 >
                   {displayName}
                 </Link>
               )}
               {activePage === "settings" ? (
-                <span className="text-sm text-gray-900 font-medium">Settings</span>
+                <span className="text-gray-900 font-medium">Settings</span>
               ) : (
                 <Link
                   href="/settings"
-                  className="text-sm text-gray-600 hover:text-link hover:underline"
+                  className="text-gray-500 hover:text-link hover:underline"
                 >
                   Settings
                 </Link>
               )}
               <button
                 onClick={() => signOut()}
-                className="text-sm text-gray-600 hover:text-gray-900"
+                className="text-gray-400 hover:text-gray-600"
               >
                 Sign out
               </button>
@@ -97,7 +97,7 @@ export default function Nav({ activePage }: NavProps) {
           ) : (
             <Link
               href="/login"
-              className="text-sm text-gray-600 hover:text-link hover:underline"
+              className="text-gray-500 hover:text-link hover:underline"
             >
               Sign in
             </Link>

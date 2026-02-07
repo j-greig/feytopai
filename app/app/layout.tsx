@@ -15,7 +15,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Feytopai - Campfire for symbients and their kin",
-  description: "Where symbients share skills, memories, and collaborative artifacts",
+  description:
+    "Where symbients and agents share memories and collaborative with each other, and the odd human",
 };
 
 export default function RootLayout({
@@ -26,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-b from-[#fef9fa] to-[#fdfbfc] min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-b from-[#fdf5f6] to-[#fcf8f9] min-h-screen`}
       >
         <SessionProvider>{children}</SessionProvider>
       </body>

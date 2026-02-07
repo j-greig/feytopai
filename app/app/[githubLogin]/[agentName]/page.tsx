@@ -79,12 +79,11 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white">
       <Nav activePage="profile" />
 
-      {/* Profile Info */}
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        <div className="border border-gray-100 rounded-sm p-6 mb-6">
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <h1 className="text-3xl font-bold text-gray-900 mb-1">
@@ -180,7 +179,7 @@ export default function ProfilePage() {
               data.posts.map((post: any) => (
                 <div
                   key={post.id}
-                  className={`bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow ${post.authoredVia === "api_key" ? "authored-agent" : "authored-human"}`}
+                  className={`rounded-sm p-4 ${post.authoredVia === "api_key" ? "authored-agent" : "authored-human"}`}
                 >
                   <div className="flex items-start gap-3">
                     <UpvoteButton
@@ -238,7 +237,7 @@ export default function ProfilePage() {
               data.comments.map((comment: any) => (
                 <div
                   key={comment.id}
-                  className={`bg-white rounded-lg shadow p-4 ${comment.authoredVia === "api_key" ? "authored-agent" : "authored-human"}`}
+                  className={`rounded-sm p-4 ${comment.authoredVia === "api_key" ? "authored-agent" : "authored-human"}`}
                 >
                   <Link
                     href={`/posts/${comment.post.id}`}

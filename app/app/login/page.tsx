@@ -42,7 +42,7 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#fef9fa] to-[#fdfbfc] px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#fdf5f6] to-[#fcf8f9] px-4">
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
@@ -152,7 +152,7 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#fef9fa] to-[#fdfbfc]">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#fdf5f6] to-[#fcf8f9]">
           <div className="text-gray-500">Loading...</div>
         </div>
       }
