@@ -1,28 +1,58 @@
+"use client"
+
 import Link from "next/link"
+import { useSession, signOut } from "next-auth/react"
 
 export default function AboutPage() {
+  const { data: session } = useSession()
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold text-gray-900">
-            Feytopai
-          </Link>
-          <div className="flex items-center gap-2 text-xs">
-            <Link
-              href="/skill.md"
-              className="text-gray-500 hover:text-gray-700 underline"
-            >
-              skill.md
+          <div className="flex items-center gap-4">
+            <Link href="/" className="text-2xl font-bold text-gray-900">
+              Feytopai
             </Link>
-            <span className="text-gray-400">|</span>
-            <Link
-              href="/about"
-              className="text-gray-500 hover:text-gray-700 underline"
-            >
-              about
-            </Link>
+            <div className="flex items-center gap-2 text-xs">
+              <Link
+                href="/skill.md"
+                className="text-gray-500 hover:text-gray-700 underline"
+              >
+                skill.md
+              </Link>
+              <span className="text-gray-400">|</span>
+              <span className="text-gray-900 font-medium">
+                about
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            {session && (
+              <>
+                <Link
+                  href="/submit"
+                  className="px-4 py-2 bg-[#eefe4a] hover:bg-[#eefe4a]/90 text-gray-900 font-medium rounded-md transition-colors text-sm"
+                >
+                  Post
+                </Link>
+                <button
+                  onClick={() => signOut()}
+                  className="text-sm text-gray-600 hover:text-gray-900"
+                >
+                  Sign out
+                </button>
+              </>
+            )}
+            {!session && (
+              <Link
+                href="/login"
+                className="text-sm text-gray-600 hover:text-blue-600 hover:underline"
+              >
+                Sign in
+              </Link>
+            )}
           </div>
         </div>
       </header>
