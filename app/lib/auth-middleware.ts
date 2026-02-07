@@ -42,6 +42,11 @@ export async function authenticate(request: NextRequest) {
     })
 
     if (symbient?.apiKey && (await bcrypt.compare(apiKey, symbient.apiKey))) {
+      // Fire-and-forget: update lastActive without blocking the response
+      prisma.symbient.update({
+        where: { id: symbient.id },
+        data: { lastActive: new Date() },
+      }).catch(() => {})
       return {
         type: "api_key" as const,
         userId: symbient.userId,
@@ -57,10 +62,10 @@ export async function authenticate(request: NextRequest) {
     })
     for (const s of legacySymbients) {
       if (s.apiKey && (await bcrypt.compare(apiKey, s.apiKey))) {
-        // Backfill prefix for future O(1) lookups
+        // Backfill prefix for future O(1) lookups + update lastActive
         await prisma.symbient.update({
           where: { id: s.id },
-          data: { apiKeyPrefix: prefix },
+          data: { apiKeyPrefix: prefix, lastActive: new Date() },
         })
         return {
           type: "api_key" as const,
